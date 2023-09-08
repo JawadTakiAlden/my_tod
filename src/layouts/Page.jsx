@@ -341,16 +341,6 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                                 "& > div": { gridColumn: isNoneMobile ? undefined : "span 4" },
                                 }}
                             >
-                                {/* <InputFields
-                                    handleBlur ={handleBlur}
-                                    handleChange ={handleChange} 
-                                    touched  ={touched}
-                                    errors ={errors}
-                                    values = {values}
-                                    setFieldValue={setFieldValue}
-                                /> */}
-
-
                                     {
                                         formInputs.map((input , i) => {
                                             // initial[input.name] = input.initialValues
@@ -361,6 +351,9 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                                                     autoWidth
                                                     label="Role"
                                                     name={input.name}
+                                                    sx={{
+                                                        gridColumn: "span 2",
+                                                    }}
                                                 >
                                                     {
                                                         input.valueOptions.map((valueObj  , i)=> (
