@@ -1,16 +1,18 @@
 import { Box, Typography, useTheme } from '@mui/material'
 import React from 'react'
 import { tokens } from '../assets/theme'
-import ChildImage from '../assets/images/shuffle-03.jpg'
+import { Link } from 'react-router-dom'
 
-const ChildCard = () => {
+const ChildCard = ({child , childClassName}) => {
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
+    console.log(child)
   return (
     <Box
         sx={{
             overflow : 'hidden',
             position : 'relative',
+            borderRadius : '8px',
             "&:hover .child-card-body" : {
                 bottom : '0'
             },
@@ -24,7 +26,7 @@ const ChildCard = () => {
                 maxWidth : '100%',
                 transition : '0.3s'
             }}
-            src={ChildImage}
+            src={`http://192.168.1.19:9000${child.image}`}
             locading={'lazy'}
         />
         <Box
@@ -46,7 +48,7 @@ const ChildCard = () => {
                     fontWeight : '500'
                 }}
             >
-                jawad taki aldeen
+                {child.name}
             </Typography>
             <Typography
                 sx={{
@@ -55,7 +57,7 @@ const ChildCard = () => {
                     fontWeight : '300'
                 }}
             >
-                KJ1
+                {childClassName}
             </Typography>
         </Box>
     </Box>

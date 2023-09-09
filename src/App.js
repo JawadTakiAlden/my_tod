@@ -23,6 +23,8 @@ import ClassInformation from './pages/ClassInformation'
 import PublicImages from './pages/PublicImages'
 import CourseInforamtion from './pages/CourseInforamtion'
 import StuffInformation from './pages/StuffInformation'
+import Childrens from './pages/Childrens'
+import ChildInformation from './pages/ChildInformation'
 
 const App = () => {
   const [theme , colorMode] = useMode()
@@ -63,7 +65,9 @@ const App = () => {
                 <Route path={'/faqs'} element={<FAQs />} />
                 <Route path={'/auth/signin'} element={<Signin />} />
                 <Route path={'/events'} element={<Events />} />
-                <Route path={'/events/:id'} element={<Event />} />
+                <Route path={'/childrens'} element={<Childrens />} />
+                <Route path={'/childrens/:childID'} element={<ChildInformation />} />
+                <Route path={'/events/:eventID'} element={<Event />} />
                 <Route path={'/status'} element={<Status />} />
                 <Route path={'/status/:id'} element={<StatusInfo />} />
                 <Route path={'/stuffs'} element={<Techers />} />

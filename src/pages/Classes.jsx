@@ -39,7 +39,6 @@ const classColumns = [
       field : 'teacher_name',
       headerName : 'Teacher Name',
       width : 150,
-      editable : true,
       valueGetter : (params) => {
         return params.row.teacher.first_name + ' ' + params.row.teacher.last_name 
       }
@@ -168,7 +167,7 @@ const Classes = () => {
         age_section_id : '',
       }}
       validationSchema={validationSchema}
-      valuesShouldUpdate={['class_name' , 'age_section']}
+      valuesShouldUpdate={['class_name']}
 
     />
   )

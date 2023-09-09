@@ -132,7 +132,7 @@ const Status = () => {
     <Box>
         <AddButton color={colors.indigoAccent[500]} reactionFunction={onAddStatusDialogOpen} />
         <GridBox
-            spacing={1}
+            spacing={2}
         >
             {
                 getStatusQuery.data.data.map((status) => (        

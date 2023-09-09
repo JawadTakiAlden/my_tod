@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Menu, MenuItem, Sidebar, sidebarClasses } from 'react-pro-sidebar'
 import { tokens } from '../assets/theme'
 import Logo from '../assets/images/logo.png'
-import { ClassOutlined, CloseOutlined, DashboardOutlined, EventOutlined, GolfCourseOutlined, ImageOutlined, ImportContactsOutlined, LeaderboardOutlined, MenuOutlined, PeopleOutlined, QuestionMarkOutlined } from '@mui/icons-material'
+import { ChildFriendlyOutlined, ClassOutlined, CloseOutlined, DashboardOutlined, EventOutlined, GolfCourseOutlined, ImageOutlined, ImportContactsOutlined, LeaderboardOutlined, MenuOutlined, PeopleOutlined, QuestionMarkOutlined, SchoolOutlined } from '@mui/icons-material'
 import {Link, useLocation} from 'react-router-dom'
 
 const MyItem = ({ title, to, icon }) => {
@@ -123,6 +123,7 @@ const DashboardSidebar = () => {
         <MyItem title={'Stuffs'} to={'/stuffs'} icon={<LeaderboardOutlined />} />
         <MyItem title={'Classes'} to={'/classes'} icon={<ClassOutlined />} />
         <MyItem title={'Courses'} to={'/courses'} icon={<GolfCourseOutlined />} />
+        <MyItem title={'Childrens'} to={'/childrens'} icon={<SchoolOutlined />} />
         <MyItem title={'FAQs'} to={'/faqs'} icon={<QuestionMarkOutlined />} />
         <MyItem title={'Events'} to={'/events'} icon={<EventOutlined />} />
         <MyItem title={'Status'} to={'/status'} icon={<ImportContactsOutlined />} />
