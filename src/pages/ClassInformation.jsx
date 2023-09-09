@@ -49,7 +49,6 @@ const ClassInformation = () => {
   }
   const classRoom = data.data.class;
   const teacher = data.data.class.teacher;
-  console.log(teacher);
   const ageSection = classRoom.age_section;
   const children = data.data.class.children;
   return (

@@ -26,7 +26,7 @@ const ChildCard = ({ child, classRoomName }) => {
           maxWidth: "100%",
           transition: "0.3s",
         }}
-        src={`${baseURL}${child.image}`}
+        src={`${baseURL}${child?.image}`}
         locading={"lazy"}
       />
       <Box
@@ -58,6 +58,15 @@ const ChildCard = ({ child, classRoomName }) => {
           }}
         >
           {classRoomName}
+        </Typography>
+        <Typography
+          sx={{
+            color: child.isExtra ? "#00a244" : "#e7121a",
+            fontSize: "16px",
+            fontWeight: "300",
+          }}
+        >
+          {child.isExtra ? "Extra" : "Not Extra"}
         </Typography>
       </Box>
     </Box>
