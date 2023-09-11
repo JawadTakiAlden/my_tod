@@ -1,4 +1,4 @@
-import { Box, List, ListItem, ListItemIcon, ListItemText, Typography, useTheme, useThemeProps } from '@mui/material'
+import { Box, IconButton, ImageList, ImageListItem, List, ListItem, ListItemIcon, ListItemText, Typography, useTheme, useThemeProps } from '@mui/material'
 import React from 'react'
 import { tokens } from '../assets/theme'
 import { CallOutlined, ClassOutlined, PermIdentityOutlined, WorkOutlined } from '@mui/icons-material'
@@ -36,6 +36,7 @@ const StuffInformation = () => {
     }
 
     const stuffInformation = getStuffQuery.data.data.account
+    console.log(stuffInformation)
   return (
     <>
         <Box>
@@ -94,26 +95,84 @@ const StuffInformation = () => {
         {
             stuffInformation.role === 'teacher'
             ? (
-                <Box
-                    sx={{
-                        marginTop : '20px',
-                    }}
-                >
-                    <GridBox spacing={2}>
-                        {
-                            stuffInformation.classRoom.children.map(child => (
-                                <GridItem
-                                    xs={12}
-                                    sm={6}
-                                    md={4}
-                                    lg={3}
+                !stuffInformation.classRoom ? (
+                    <Typography
+                        sx={{
+                            color : colors.yellowAccent[500],
+                            fontSize : '25px',
+                            textTransform : 'capitalize'
+                        }}
+                    > This Teacher Havent Teacher Yet </Typography>
+                )
+                : (
+                    <ImageList variant="masonry" cols={3} gap={8}>
+                            {stuffInformation.classRoom.children.map((item) => (
+                            <ImageListItem 
+                                key={item.image}
+                                sx={{
+                                    overflow : 'hidden',
+                                    position : 'relative',
+                                    borderRadius : '8px',
+                                    boxShadow : '1px 1px 10px -2px #black',
+                                    "&:hover .child-card-body" : {
+                                        bottom : '0'
+                                    },
+                                    "&:hover > img" : {
+                                        transform : 'rotate(1deg) scale(1.1)'
+                                    }
+                                }}
+                                
+                            >
+                                <img
+                                src={`http://192.168.1.19:9000${item.image}?w=248&fit=crop&auto=format`}
+                                srcSet={`http://192.168.1.19:9000${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                                alt={item.image}
+                                loading="lazy"
+                                style={{
+                                    borderRadius : '6px 6px 0 0',
+                                    transition : '0.3s'
+                                }}
+                                />
+                                <Box
+                                    className={'child-card-body'}
+                                    sx={{
+                                        position : 'absolute',
+                                        width : '100%',
+                                        padding : '20px',
+                                        backgroundColor : 'white',
+                                        transition : '0.3s',
+                                        left : '0',
+                                        bottom : '-100%'
+                                    }}
                                 >
-                                    <ChildCard child={child} childClassName={stuffInformation.classRoom.name} />
-                                </GridItem>
-                            ))
-                        }
-                    </GridBox>
-                </Box>
+                                    <Typography
+                                        sx={{
+                                            color : colors.indigoAccent[500],
+                                            fontSize : '20px',
+                                            fontWeight : '500'
+                                        }}
+                                    >
+                                        {item.name}
+                                    </Typography>
+                                    {
+                                        item.isExtra && (
+                                            <Typography
+                                                sx={{
+                                                    color : colors.grey[200],
+                                                    fontSize : '16px',
+                                                    fontWeight : '300'
+                                                }}
+                                            >
+                                                Extra
+                                            </Typography>
+                                        )
+                                    }
+                                </Box>
+                            </ImageListItem>
+                        ))}
+                    </ImageList>
+                )
+                
             )
             : undefined
         }

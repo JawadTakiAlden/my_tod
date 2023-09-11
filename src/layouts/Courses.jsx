@@ -127,6 +127,7 @@ const Courses = () => {
 
       validationSchema={validationSchema}
       valuesShouldUpdate={['name' , 'description']}
+      updateAPI={'/course'}
     />
   )
 }

@@ -167,8 +167,8 @@ const Classes = () => {
         age_section_id : '',
       }}
       validationSchema={validationSchema}
-      valuesShouldUpdate={['class_name']}
-
+      valuesShouldUpdate={['name']}
+      updateAPI={'/classroom'}
     />
   )
 }

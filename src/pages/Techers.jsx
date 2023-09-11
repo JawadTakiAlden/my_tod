@@ -29,6 +29,13 @@ const techersColumns = [
       // flex : 1
   },
   {
+    field : 'username',
+    headerName : 'Username',
+    width : 150,
+    editable : true
+    // flex : 1
+},
+  {
       field : 'phone',
       headerName : 'Phone Number',
       editable : true,
@@ -76,8 +83,6 @@ const Techers = () => {
         refetch()
       }
     }
-
-    console.log(data)
   return (
     <Page 
       name={'stuff'} 
@@ -131,6 +136,7 @@ const Techers = () => {
       }}
       validationSchema={validationSchema}
       valuesShouldUpdate={['first_name' , 'last_name' , 'phone']}
+      updateAPI={'/accounts'}
     />
   )
 }

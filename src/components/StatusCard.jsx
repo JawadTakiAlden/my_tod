@@ -7,8 +7,17 @@ import { DeleteOutlined, LinkOutlined, UpdateOutlined } from '@mui/icons-materia
 import { Link } from 'react-router-dom'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
+import { useMutation } from '@tanstack/react-query'
+import { request } from '../api/request'
 
-const StatusCard = ({type}) => {
+const delteSubStatusFromServer = (id) => {
+    return request({
+        url : `/substatus/${id}`,
+        method : 'delete'
+    })
+}
+
+const StatusCard = ({type , subStatus}) => {
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
     const [deleteDialogOpen , setDeleteDialogOpen] = useState(false)
@@ -17,9 +26,6 @@ const StatusCard = ({type}) => {
     const randomNumberBetween100And700 = (randomNumberBetween0Adn7 !== 0 ? randomNumberBetween0Adn7 : 1) * 100
     const randomColor = colors.mix[randomNumberBetween100And700]
 
-    const deleteEventHandling = () => {
-        console.log('Event Card Page : request for delete this event')
-    }
 
     const deleteEventDialogOpen = () => {
         setDeleteDialogOpen(true)
@@ -30,14 +36,41 @@ const StatusCard = ({type}) => {
         console.log('Event Card Page : delete event rejected by click on cancle button')
     }
 
+
+    const deletesubStatus = useMutation({
+        mutationKey : [`delete-substatus-${subStatus.id}-from-server`],
+        mutationFn : () => delteSubStatusFromServer(subStatus.id)
+    })
+
     const deleteDialogConfirm = () => {
-        deleteEventHandling()
+        deletesubStatus.mutate(subStatus.id)
         setDeleteDialogOpen(false)
     }
 
+    const updateSubStatusInServer = (values) => {
+        return request({
+            url : `/substatus/${subStatus.id}`,
+            method : 'post',
+            data : {
+                ...values,
+                _method : 'put'
+            }
+        })
+    }
+
+    const updateSubStatusMutation = useMutation({
+        mutationKey : [`update-substatus-${subStatus.id}-in-server`],
+        mutationFn : updateSubStatusInServer
+    })
     const updateEventHandler = (values) => {
-        console.log('Event Card Page : request for update this event')
-        console.log(values)
+        let data = {
+            name : values.name,
+        }
+
+        if(values.image){
+            data['image'] = values.imageFile
+        }
+        updateSubStatusMutation.mutate(data)
     }
     const updateEventDialogOpen = () => {
         setUpdateDialogOpen(true)
@@ -47,8 +80,9 @@ const StatusCard = ({type}) => {
         console.log('update event action canceld by click on cancel button')
     }
     const initialValues = {
-        name : '',
+        name : subStatus.name,
         image : '',
+        imageFile : ''
       }
 
   return (
@@ -101,7 +135,7 @@ const StatusCard = ({type}) => {
                     borderRadius : '10px'
                 }}
                 alt='event-cover-background'
-                src={Image}
+                src={`http://192.168.1.19:9000${subStatus.image}`}
                 />
                 <Box
                     sx={{
@@ -208,7 +242,7 @@ const StatusCard = ({type}) => {
                         transition : '0.3s'
                     }}
                 >
-                    status name
+                    {subStatus.name}
                 </Typography>
             </Box>
         </Box>
@@ -282,6 +316,7 @@ const StatusCard = ({type}) => {
               handleBlur,
               handleChange,
               handleSubmit,
+              setFieldValue
             }
           ) => (
             <form onSubmit={handleSubmit}>
@@ -294,31 +329,34 @@ const StatusCard = ({type}) => {
                 }}
               >
                 <TextField
-                    fullWidth
-                    variant="filled"
-                    type="text"
-                    label="name"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.name}
-                    name="name"
-                    error={!!touched.name && !!errors.name}
-                    helperText={touched.name && errors.name}
-                    sx={{ gridColumn: "span 4" }}
-                />
-                <TextField
-                    fullWidth
-                    variant="standard"
-                    type="file"
-                    label="image"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.image}
-                    name="image"
-                    error={!!touched.image && !!errors.image}
-                    helperText={touched.image && errors.image}
-                    sx={{ gridColumn: "span 4" }}
-                />
+                                    fullWidth
+                                    variant="filled"
+                                    type="text"
+                                    label="Name"
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    value={values.name}
+                                    name="name"
+                                    error={!!touched.name && !!errors.name}
+                                    helperText={touched.name && errors.name}
+                                    sx={{ gridColumn: "span 4" }}
+                                />
+                                <TextField
+                                    fullWidth
+                                    variant="filled"
+                                    type="file"
+                                    label="Image"
+                                    onBlur={handleBlur}
+                                    onChange={(e) => {
+                                        setFieldValue('imageFile' , e.currentTarget.files[0])
+                                        handleChange(e)
+                                    }}
+                                    value={values.image}
+                                    name="image"
+                                    error={!!touched.image && !!errors.image}
+                                    helperText={touched.image && errors.image}
+                                    sx={{ gridColumn: "span 4" }}
+                                />
               </Box>
               <Box display="flex" justifyContent="end" mt="20px">
                 <Button type="submit" color="success" variant="contained">
@@ -342,7 +380,6 @@ const StatusCard = ({type}) => {
 
 const validationSchema = Yup.object({
     name :  Yup.string().required('name field is required'),
-    image :  Yup.string().required('answer field is required'),
   })
   
 

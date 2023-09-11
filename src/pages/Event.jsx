@@ -133,29 +133,29 @@ const Event = () => {
     <Box>
     <ImageList variant="masonry" cols={3} gap={8}>
       <ImageListItem>
-      <Box
-            sx={{
-              height : '250px',
-              borderRadius : '8px',
-              display : 'flex',
-              alignItems : 'center',
-              justifyContent : 'center',
-              boxShadow : `2px 2px 10px -5px ${colors.indigoAccent[400]}`,
-              transition : '0.3s',
-              cursor : 'pointer',
-              "&:hover" : {
-                backgroundColor : colors.primary[400],
-              }
-            }}
-            onClick={AddImageDialogOpen}
-          >
-            <AddOutlined 
+        <Box
               sx={{
-                fontSize : '80px',
+                height : '250px',
+                borderRadius : '8px',
+                display : 'flex',
+                alignItems : 'center',
+                justifyContent : 'center',
+                boxShadow : `2px 2px 10px -5px ${colors.indigoAccent[400]}`,
+                transition : '0.3s',
+                cursor : 'pointer',
+                "&:hover" : {
+                  backgroundColor : colors.primary[400],
+                }
               }}
-            />
-          </Box>
-      </ImageListItem>
+              onClick={AddImageDialogOpen}
+            >
+              <AddOutlined 
+                sx={{
+                  fontSize : '80px',
+                }}
+              />
+            </Box>
+        </ImageListItem>
         {eventInformation.event_images.map((item) => (
           <ImageListItem 
             key={item.src}
@@ -186,8 +186,8 @@ const Event = () => {
               <DeleteOutlined />
             </IconButton>
             <img
-              src={`http://127.0.0.1:8000${item.src}?w=248&fit=crop&auto=format`}
-              srcSet={`http://127.0.0.1:8000${item.src}?w=248&fit=crop&auto=format&dpr=2 2x`}
+              src={`http://192.168.1.19:9000${item.src}?w=248&fit=crop&auto=format`}
+              srcSet={`http://192.168.1.19:9000${item.src}?w=248&fit=crop&auto=format&dpr=2 2x`}
               alt={item.src}
               loading="lazy"
               style={{
