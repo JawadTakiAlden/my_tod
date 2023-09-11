@@ -11,7 +11,7 @@ import { useMutation } from '@tanstack/react-query'
 import { request } from '../api/request'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
 
-const Page = ({columns , data , name , link , formInputs , validationSchema , valuesShouldUpdate , initialValues }) => {
+const Page = ({columns , data , name , link , formInputs , validationSchema , valuesShouldUpdate , initialValues  , updateAPI}) => {
     const [clickedRow , setClickedRow] = useState()
     const [deleteRowDialogOpen , setDeleteRowDialogOpen] = useState(false)
     const [fromOpen , setFormOpen] = useState(false)
@@ -175,7 +175,7 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                         >
                             <NavigateNextOutlined />
                         </IconButton>
-                        <SaveAction {...{params , rowId , setRowId , name , valuesShouldUpdate}} />
+                        <SaveAction {...{params , rowId , setRowId , name , valuesShouldUpdate , updateAPI}} />
                         <IconButton
                             onClick={() => onDeleteRowDialogOpen(params.row.id)}
                         >
@@ -341,16 +341,6 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                                 "& > div": { gridColumn: isNoneMobile ? undefined : "span 4" },
                                 }}
                             >
-                                {/* <InputFields
-                                    handleBlur ={handleBlur}
-                                    handleChange ={handleChange} 
-                                    touched  ={touched}
-                                    errors ={errors}
-                                    values = {values}
-                                    setFieldValue={setFieldValue}
-                                /> */}
-
-
                                     {
                                         formInputs.map((input , i) => {
                                             // initial[input.name] = input.initialValues
@@ -361,6 +351,9 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                                                     autoWidth
                                                     label="Role"
                                                     name={input.name}
+                                                    sx={{
+                                                        gridColumn: "span 2",
+                                                    }}
                                                 >
                                                     {
                                                         input.valueOptions.map((valueObj  , i)=> (

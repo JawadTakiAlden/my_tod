@@ -7,11 +7,10 @@ import CubeLoader from '../components/CubeLoader/CubeLoader'
 import { useNavigate } from 'react-router'
 
 const validationSchema = Yup.object({
-  class_name : Yup.string().required('class name field is required'),
-  age_section : Yup.string().required('age section field is required'),
-  teacher_name : Yup.string().required('teacher name field is required'),
+  name : Yup.string().required('class name field is required'),
+  age_section_id : Yup.string().required('age section field is required'),
+  teacher_id : Yup.string().required('teacher name field is required'),
 })
-
 
 
 const classColumns = [
@@ -40,7 +39,9 @@ const classColumns = [
       field : 'teacher_name',
       headerName : 'Teacher Name',
       width : 150,
-      editable : true
+      valueGetter : (params) => {
+        return params.row.teacher.first_name + ' ' + params.row.teacher.last_name 
+      }
       // flex : 1
   },
 ]
@@ -73,6 +74,16 @@ const orginizeData = (values) => {
       value : valuesObject.id
     }
   ))
+
+  return newValues
+}
+
+
+const OrgnizeAgeSectionData = (values) => {
+  const newValues = values.map(valueObject => ({
+    name : 'from ' +  valueObject.from + ' to ' + valueObject.to,
+    value : valueObject.id
+  })) 
 
   return newValues
 }
@@ -114,7 +125,9 @@ const Classes = () => {
       return obj.role === 'teacher'  
     })
 
-    // const ageSection = ageSectionQuery.data.data.data
+    const ageSection = ageSectionQuery.data.data.data
+
+    console.log(data.data)
   return (
     <Page 
       name={'class'} 
@@ -125,7 +138,7 @@ const Classes = () => {
       }}
       formInputs={[
         {
-          name : 'class_name',
+          name : 'name',
           lable : 'Class Name',
           type : 'text',
           initialValues : '',
@@ -139,14 +152,23 @@ const Classes = () => {
           fullWidth : true,
           valueOptions : orginizeData(teachers)
         },
+        {
+          name : 'age_section_id',
+          lable : 'Age Section',
+          type : 'select',
+          initialValues : '',
+          fullWidth : true,
+          valueOptions : OrgnizeAgeSectionData(ageSection)
+        },
       ]}
       initialValues={{
-        class_name : '',
+        name : '',
         teacher_id : '',
+        age_section_id : '',
       }}
       validationSchema={validationSchema}
-      valuesShouldUpdate={['class_name' , 'age_section']}
-
+      valuesShouldUpdate={['name']}
+      updateAPI={'/classroom'}
     />
   )
 }

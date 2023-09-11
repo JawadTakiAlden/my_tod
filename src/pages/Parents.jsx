@@ -134,6 +134,7 @@ const Parents = () => {
       }}
         validationSchema={validationSchema}
         valuesShouldUpdate={['first_name' , 'last_name' , 'phone']}
+        updateAPI={'/accounts'}
     />
   )
 }

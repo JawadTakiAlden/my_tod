@@ -8,7 +8,7 @@ import { request } from '../api/request'
 import { useMutation } from '@tanstack/react-query'
 
 
-const SaveAction = ({ params , rowId , setRowId , name , valuesShouldUpdate}) => {
+const SaveAction = ({ params , rowId , setRowId , name , valuesShouldUpdate , updateAPI}) => {
     const [loading , setLoading] = useState(false)
     const [success , setSuccess] = useState(false)
     const [open , setOpen] = useState(false)
@@ -17,7 +17,7 @@ const SaveAction = ({ params , rowId , setRowId , name , valuesShouldUpdate}) =>
     const colors = tokens(theme.palette.mode)
     const updateInformationInServer = (values) => {
         return request({
-            url : `/accounts/${params.id}`,
+            url : `${updateAPI}/${params.id}`,
             method : 'PATCH',
             data : values
         })
@@ -81,6 +81,7 @@ const SaveAction = ({ params , rowId , setRowId , name , valuesShouldUpdate}) =>
         valuesShouldUpdate.map(attribute => {
             dataForUpdate[attribute] = params.row[attribute]
         })
+        console.log(dataForUpdate)
         updateInformationMutation.mutate(dataForUpdate)
     }
     useEffect(() => {
