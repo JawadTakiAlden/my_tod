@@ -140,6 +140,7 @@ const Childrens = () => {
       }}
         validationSchema={validationSchema}
         valuesShouldUpdate={['name' , 'is_extra' , 'gender']}
+        updateAPI={'/children'}
     />
   )
 }

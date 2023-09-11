@@ -19,6 +19,9 @@ import { useQuery } from "@tanstack/react-query";
 import CubeLoader from "../components/CubeLoader/CubeLoader";
 import NetworkError from "./Errors/NetworkError";
 
+
+
+
 const ClassInformation = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -33,6 +36,8 @@ const ClassInformation = () => {
     queryKey: ["get-classRoom-details"],
     queryFn: getChildrenClasses,
   });
+
+  
 
   if (isLoading) {
     return <CubeLoader />;
@@ -51,7 +56,9 @@ const ClassInformation = () => {
   const teacher = data.data.class.teacher;
   const ageSection = classRoom.age_section;
   const children = data.data.class.children;
+  console.log()
   return (
+    <>
     <Box>
       <List>
         <ListItem>
@@ -89,7 +96,7 @@ const ClassInformation = () => {
           >
             teacher : {teacher.first_name} {teacher.last_name}
             <Link
-              to={`/staff/${teacher.id}`}
+              to={`/stuffs/${teacher.id}`}
               style={{ color: colors.yellowAccent[500] }}
             >
               {" "}
@@ -151,6 +158,8 @@ const ClassInformation = () => {
         </GridBox>
       </Box>
     </Box>
+    
+    </>
   );
 };
 
