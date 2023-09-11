@@ -10,7 +10,7 @@ import * as Yup from 'yup'
 import AddButton from '../components/AddButton'
 import { useNavigate, useParams } from 'react-router'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { request } from '../api/request'
+import { baseURLImage, request } from '../api/request'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
 
 
@@ -186,8 +186,8 @@ const Event = () => {
               <DeleteOutlined />
             </IconButton>
             <img
-              src={`http://192.168.1.19:9000${item.src}?w=248&fit=crop&auto=format`}
-              srcSet={`http://192.168.1.19:9000${item.src}?w=248&fit=crop&auto=format&dpr=2 2x`}
+              src={`${baseURLImage}${item.src}?w=248&fit=crop&auto=format`}
+              srcSet={`${baseURLImage}${item.src}?w=248&fit=crop&auto=format&dpr=2 2x`}
               alt={item.src}
               loading="lazy"
               style={{

@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { useMutation } from '@tanstack/react-query'
-import { request } from '../api/request'
+import { baseURLImage, request } from '../api/request'
 
 const delteSubStatusFromServer = (id) => {
     return request({
@@ -50,10 +50,9 @@ const StatusCard = ({type , subStatus}) => {
     const updateSubStatusInServer = (values) => {
         return request({
             url : `/substatus/${subStatus.id}`,
-            method : 'post',
+            method : 'put',
             data : {
-                ...values,
-                _method : 'put'
+                ...values
             }
         })
     }
@@ -70,6 +69,7 @@ const StatusCard = ({type , subStatus}) => {
         if(values.image){
             data['image'] = values.imageFile
         }
+        // console.log(data)
         updateSubStatusMutation.mutate(data)
     }
     const updateEventDialogOpen = () => {
@@ -135,7 +135,7 @@ const StatusCard = ({type , subStatus}) => {
                     borderRadius : '10px'
                 }}
                 alt='event-cover-background'
-                src={`http://192.168.1.19:9000${subStatus.image}`}
+                src={`${baseURLImage}${subStatus.image}`}
                 />
                 <Box
                     sx={{

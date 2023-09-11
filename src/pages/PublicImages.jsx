@@ -1,6 +1,6 @@
 import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ImageList, ImageListItem, Snackbar, TextField, Typography, useTheme } from '@mui/material';
 import React , {useState} from 'react';
-import { request } from '../api/request';
+import { baseURLImage, request } from '../api/request';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import CubeLoader from '../components/CubeLoader/CubeLoader';
 import { useNavigate } from 'react-router';
@@ -228,7 +228,7 @@ const PublicImages = () => {
               <DeleteOutlined />
             </IconButton>
             <img
-              src={`http://127.0.0.1:8000${item.image_url}?w=248&fit=crop&auto=format`}
+              src={`${baseURLImage}${item.image_url}?w=248&fit=crop&auto=format`}
               srcSet={`http://127.0.0.1:8000${item.image_url}?w=248&fit=crop&auto=format&dpr=2 2x`}
               alt={item.title}
               loading="lazy"

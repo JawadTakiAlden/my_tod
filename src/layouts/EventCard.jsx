@@ -5,7 +5,7 @@ import Image from '../assets/images/avatar-04.png'
 import { tokens } from '../assets/theme'
 import { DeleteOutlined, LinkOutlined } from '@mui/icons-material'
 import { Link } from 'react-router-dom'
-import { request } from '../api/request'
+import { baseURLImage, request } from '../api/request'
 import { useMutation } from '@tanstack/react-query'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
 
@@ -146,7 +146,7 @@ const EventCard = ({eventData , refetch}) => {
                     maxHeight : '200px'
                 }}
                 alt='event-cover-background'
-                src={`http://127.0.0.1:8000${eventData?.image_cover}`}
+                src={`${baseURLImage}${eventData?.image_cover}`}
                 />
                 <Box
                     sx={{
