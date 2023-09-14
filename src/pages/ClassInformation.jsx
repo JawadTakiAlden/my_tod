@@ -150,7 +150,7 @@ const ClassInformation = () => {
         <GridBox spacing={1}>
           {children.map((item) => {
             return (
-              <GridItem xs={12} sm={6} md={4} lg={3}>
+              <GridItem key={item.id} xs={12} sm={6} md={4} lg={3}>
                 <ChildCard classRoomName={classRoom.name} child={item} />
               </GridItem>
             );

@@ -1,13 +1,13 @@
-import { PermIdentityOutlined} from '@mui/icons-material'
+import { CloudUpload, PermIdentityOutlined} from '@mui/icons-material'
 import { Box, Button, ImageList, ImageListItem, List, ListItem, ListItemIcon, ListItemText, TextField, Typography, useTheme } from '@mui/material'
 import React, { useState } from 'react'
 import { tokens } from '../assets/theme'
 import { useLocation, useParams } from 'react-router'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
-import { request } from '../api/request'
+import { baseURLImage, request } from '../api/request'
 import { useMutation } from '@tanstack/react-query'
-
+import { VisuallyHiddenInput } from '../components/VisuallyHiddenInput'
 
 
 const ChildInformation = () => {
@@ -15,6 +15,15 @@ const ChildInformation = () => {
     const [updateFormOpen , setUpdateFormOpen] = useState(false)
     const colors = tokens(theme.palette.mode)
     const {state : {data}} = useLocation()
+
+    const [imagePreview, setImagePreview] = useState(null);
+
+
+    const handleSelectImage = (event) => {
+        const file = event.target.files[0];
+        
+        setImagePreview(URL.createObjectURL(file))
+      }
 
     console.log(data)
     const initialValues = {
@@ -52,7 +61,8 @@ const ChildInformation = () => {
     <Box>
         <Button
             onClick={()=> setUpdateFormOpen(true)}
-            color='info'
+            variant='contained'
+            color='secondary'
         >
             update image
         </Button>
@@ -90,22 +100,46 @@ const ChildInformation = () => {
                             "& > div": { gridColumn:"span 4" },
                             }}
                         >
-                            <TextField
+                            <Button
+                                component="label"
+                                variant="contained"
+                                startIcon={<CloudUpload />}
+                                href="#file-upload"
                                 fullWidth
-                                variant="filled"
-                                type="file"
-                                label="Image"
-                                onBlur={handleBlur}
-                                onChange={(e) => {
+                                color='secondary'
+                                sx={{
+                                    gridColumn: "span 4",
+                                    padding : '10px 20px'
+                                }}
+                            >
+                                Upload a file
+                                <VisuallyHiddenInput onChange={(e) => {
                                     setFieldValue('imageFile' , e.currentTarget.files[0])
                                     handleChange(e)
-                                }}
-                                value={values.image}
-                                name="image"
-                                error={!!touched.image && !!errors.image}
-                                helperText={touched.image && errors.image}
-                                sx={{ gridColumn: "span 4" }}
-                            />
+                                    handleSelectImage(e)
+                                }} type="file" name="image" value={values.image} />
+                            </Button>
+                            {
+                                imagePreview && (
+                                    <Box
+                                        sx={{
+                                            gridColumn: "span 4",
+                                            textAlign : 'center',
+                                            maxHeight : '200px',
+                                            overflowY: 'auto'
+                                        }}
+                                    >
+                                    <img 
+                                        src={imagePreview}
+                                        style={{
+                                            maxWidth : '200px',
+                                            borderRadius :'10px',
+                                            border : '1px dotted #888'
+                                        }}
+                                    />
+                                    </Box>
+                                )
+                            }
                         </Box>
                         <Box display="flex" justifyContent="end" mt="20px" gap={'10px'}>
                             <Button type="submit" color="success" variant="contained">
@@ -143,8 +177,8 @@ const ChildInformation = () => {
                     
                 >
                     <img
-                    src={`http://192.168.1.19:9000${data.image}?w=248&fit=crop&auto=format`}
-                    srcSet={`http://192.168.1.19:9000${data.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                    src={`${baseURLImage}${data.image}?w=248&fit=crop&auto=format`}
+                    srcSet={`${baseURLImage}${data.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
                     alt={data.image}
                     loading="lazy"
                     style={{

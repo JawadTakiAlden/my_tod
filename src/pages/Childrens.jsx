@@ -43,7 +43,7 @@ const cloumns = [
         }
     },
     {
-        field : 'is_extra',
+        field : 'isExtra',
         type : 'boolean',
         editable : true,
         headerName : 'Is Extra'
@@ -64,13 +64,38 @@ const getChildrensFromServer = () => {
     })
 }
 
+const getParentsFromServer = () => {
+  return request({
+      url : '/accounts?type=parent',
+      method : 'get'
+  })
+}
+
+const getClassesFromServer = () => {
+  return request({
+    url : '/classroom',
+    method : 'get'
+  })
+}
+
+
 const validationSchema = Yup.object({
   name : Yup.string().required('name field is requied'),
   image : Yup.string().required('image field is requied'),
-  is_extra : Yup.boolean().required('is extra field is required'),
-  gender : Yup.string().required('gender field is required')
+  isExtra : Yup.boolean().required('is extra field is required'),
+  gender : Yup.string().required('gender field is required'),
+  parent_id : Yup.string().required('parent is a required field'),
+  classRoom_id : Yup.string().required('class room is a required field')
 })
 
+
+const orginizeParentsData = (data) => {
+  return data.map(obj => ({name : obj.username , value : obj.id}))
+}
+
+const orginizeClassesData = (data) => {
+  return data.map(obj => ({name : obj.name , value : obj.id}))
+}
 
 
 const Childrens = () => {
@@ -81,7 +106,17 @@ const Childrens = () => {
         queryFn : getChildrensFromServer
     })
 
-    if(childrensQuery.isLoading){
+    const parentsQuery = useQuery({
+      queryKey : ['get-parents-from-server-for-childrens'],
+      queryFn : getParentsFromServer
+    })
+
+    const classesQuery = useQuery({
+      queryKey : ['get-classes-from-server-for-childrens'],
+      queryFn : getClassesFromServer
+    })
+
+    if(childrensQuery.isLoading || parentsQuery.isLoading || classesQuery.isLoading){
         return <CubeLoader />
       }
     
@@ -97,6 +132,10 @@ const Childrens = () => {
         }
       }
 
+      const parentsSelectOptions = orginizeParentsData(parentsQuery.data.data.data)
+      const classesSelectOptions = orginizeClassesData(classesQuery.data.data)
+
+      console.log(classesSelectOptions)
   return (
     <Page 
     name={'childrens'} 
@@ -120,26 +159,51 @@ const Childrens = () => {
         fullWidth : true
       },
       {
-        name : 'gender',
-        lable : 'Phone',
-        type : 'text',
-        initialValues : '',
-        fullWidth : true
+        name : 'parent_id',
+        lable : 'Parent',
+        type : 'select',
+        fullWidth : true,
+        valueOptions : parentsSelectOptions
       },
       {
-        name : 'is_extra',
-        lable : 'Is Extra',
-        type : 'checkbox',
+        name : 'gender',
+        lable : 'Gender',
+        type : 'select',
         fullWidth : true,
+        valueOptions : [
+          {name : 'mail' , value : 'mail'},
+          {name : 'femail' , value : 'femail'},
+        ]
       },
+      {
+        name : 'isExtra',
+        lable : 'Is Extra',
+        type : 'select',
+        fullWidth : true,
+        valueOptions : [
+          {name : 'normal' , value : 0},
+          {name : 'extra' , value : 1},
+        ]
+      },
+      {
+        name : 'classRoom_id',
+        lable : 'Class',
+        type : 'select',
+        fullWidth : true,
+        valueOptions : classesSelectOptions
+      },
+      
     ]}
       initialValues={{
         name : '',
         image : '',
-        is_extra : ''
+        isExtra : 0,
+        gender : 'mail',
+        parent_id : '',
+        classRoom_id : classesSelectOptions.length > 0  ? 1 : '' 
       }}
         validationSchema={validationSchema}
-        valuesShouldUpdate={['name' , 'is_extra' , 'gender']}
+        valuesShouldUpdate={['name' , 'isExtra' , 'gender']}
         updateAPI={'/children'}
     />
   )

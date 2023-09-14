@@ -163,8 +163,8 @@ const ShowParentInformation = () => {
         <GridBox spacing={1}>
           {children.map((item) => {
             return (
-              <GridItem xs={12} sm={6} md={4} lg={3}>
-                <ChildCard classRoomName={item.class_room.name} child={item} />
+              <GridItem key={item.id} xs={12} sm={6} md={4} lg={3}>
+                <ChildCard classRoomName={item?.class_room?.name} child={item} />
               </GridItem>
             );
           })}

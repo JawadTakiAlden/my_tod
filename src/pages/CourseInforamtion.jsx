@@ -187,7 +187,6 @@ const CourseInforamtion = () => {
 
   const course = data.data.course;
   const children = data.data.course.children;
-  console.log(children)
   return (
     <>
     <Button
@@ -197,6 +196,7 @@ const CourseInforamtion = () => {
           marginLeft : '10px'
         }}
         color="secondary"
+        variant="contained"
         onClick={handleClickOpen}
       >
         add childrens

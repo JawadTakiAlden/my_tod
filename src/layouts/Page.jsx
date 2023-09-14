@@ -2,7 +2,7 @@ import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContent
 import React, {  useState } from 'react'
 import { tokens } from '../assets/theme'
 import { Formik } from 'formik'
-import { DeleteOutlined, NavigateNextOutlined } from '@mui/icons-material'
+import { CloudUpload, DeleteOutlined, NavigateNextOutlined } from '@mui/icons-material'
 import { Link, useLocation } from 'react-router-dom'
 import { DataGrid, GridNoRowsOverlay, GridToolbar } from '@mui/x-data-grid'
 import SaveAction from '../components/SaveAction'
@@ -10,6 +10,7 @@ import { useMemo } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { request } from '../api/request'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
+import { VisuallyHiddenInput } from '../components/VisuallyHiddenInput'
 import { styled } from '@mui/material/styles';
 
 const StyledGridOverlay = styled('div')(({ theme }) => ({
@@ -95,6 +96,15 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
     const colors = tokens(theme.palette.mode)
     const isNoneMobile = useMediaQuery('(min-width : 600px')
     const location = useLocation()
+
+    const [imagePreview, setImagePreview] = useState(null);
+
+
+    const handleSelectImage = (event) => {
+        const file = event.target.files[0];
+        
+        setImagePreview(URL.createObjectURL(file))
+      }
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
@@ -426,8 +436,9 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                                                     value={values[input.name]}
                                                     onChange={handleChange}
                                                     autoWidth
-                                                    label="Role"
+                                                    label={input.lable}
                                                     name={input.name}
+                                                    variant='filled'
                                                     sx={{
                                                         gridColumn: "span 2",
                                                     }}
@@ -440,27 +451,72 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                                                 </Select>
                                             }
                                 
+                                            // if(input.type === 'file'){
+                                            //     // initial.imageFile = {}
+                                            //     return <TextField 
+                                            //     key={i}
+                                            //     fullWidth={input.fullWidth}
+                                            //     variant="filled"
+                                            //     type={input.type}
+                                            //     label={input.lable}
+                                            //     onBlur={handleBlur}
+                                            //     onChange={(e) => {
+                                            //         setFieldValue('imageFile' , e.currentTarget.files[0])
+                                            //         handleChange(e)
+                                            //     }}
+                                            //     value={values[input.name]}
+                                            //     name={input.name}
+                                            //     error={!!touched[input.name] && !!errors[input.name]}
+                                            //     helperText={touched[input.name] && errors[input.name]}
+                                            //     sx={{ 
+                                            //         gridColumn: "span 2",
+                                            //     }}
+                                            // />
+                                            // }
+
                                             if(input.type === 'file'){
-                                                // initial.imageFile = {}
-                                                return <TextField 
-                                                key={i}
-                                                fullWidth={input.fullWidth}
-                                                variant="filled"
-                                                type={input.type}
-                                                label={input.lable}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => {
-                                                    setFieldValue('imageFile' , e.currentTarget.files[0])
-                                                    handleChange(e)
-                                                }}
-                                                value={values[input.name]}
-                                                name={input.name}
-                                                error={!!touched[input.name] && !!errors[input.name]}
-                                                helperText={touched[input.name] && errors[input.name]}
-                                                sx={{ 
-                                                    gridColumn: "span 2",
-                                                }}
-                                            />
+                                                return <>
+                                                    <Button
+                                                            component="label"
+                                                            variant="contained"
+                                                            startIcon={<CloudUpload />}
+                                                            href="#file-upload"
+                                                            fullWidth
+                                                            color='secondary'
+                                                            sx={{
+                                                                gridColumn: "span 2",
+                                                            }}
+                                                        >
+                                                            Upload a file
+                                                            <VisuallyHiddenInput onChange={(e) => {
+                                                                setFieldValue('imageFile' , e.currentTarget.files[0])
+                                                                handleChange(e)
+                                                                handleSelectImage(e)
+                                                            }} type="file" name="image" value={values.image} />
+                                                        </Button>
+                                                        {
+                                                            imagePreview && (
+                                                                <Box
+                                                                    sx={{
+                                                                        gridColumn: "span 4",
+                                                                        textAlign : 'center',
+                                                                        maxHeight : '200px',
+                                                                        overflowY: 'auto'
+                                                                    }}
+                                                                >
+                                                                <img 
+                                                                    src={imagePreview}
+                                                                    style={{
+                                                                        maxWidth : '200px',
+                                                                        borderRadius :'10px',
+                                                                        border : '1px dotted #888'
+                                                                    }}
+                                                                />
+                                                                </Box>
+                                                            )
+                                                        }
+                                                
+                                                </>
                                             }
                                 
                                 
