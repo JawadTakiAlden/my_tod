@@ -17,12 +17,10 @@ const deleteEventFromServer = (id) => {
     })
 }
 
-const EventCard = ({eventData , refetch}) => {
+const EventCard = ({eventData , refetch , setMessage , setMessageType , setOpen}) => {
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
     const [deleteDialogOpen , setDeleteDialogOpen] = useState(false)
-    const [open , setOpen] = useState(false)
-    const [error , setError] = useState("")
     const randomNumberBetween0Adn7 = Math.floor(Math.random() * 7)
     const randomNumberBetween100And700 = (randomNumberBetween0Adn7 !== 0 ? randomNumberBetween0Adn7 : 1) * 100
     const randomColor = colors.mix[randomNumberBetween100And700]
@@ -36,50 +34,60 @@ const EventCard = ({eventData , refetch}) => {
         setDeleteDialogOpen(false)
     }
 
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-          return;
-        }
-    
-        setOpen(false);
-      };
 
     const deleteEventMutate = useMutation({
         mutationKey : ['delete-event-from-server'],
         mutationFn : deleteEventFromServer,
         onSuccess : (data) => {
             refetch()
+            setMessage('one event deleted successfully')
+            setMessageType('warning')
+            setOpen(true)
         },
         onError : (error) => {
-            if(!error.response || error.message === 'Network Error'){
-                setError("obbs , you have internet connection problems")
-                setOpen(true)
-                return
-            }
-            switch(error.response.status){
-                case 404 : {
-                    setError("obbs , you're out of space , the destenation not found in our system")
-                    setOpen(true)
-                    break ;
-                }
+            if (error.response){
+              switch(error.response.status){
                 case 401 : {
-                    setError("you're not authorize to delete this event")
-                    setOpen(true)
-                    break ;
+                    setMessage('you are not authorize to make this request')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
-
+                case 422 : {
+                    setMessage('problems with data you are entered')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
                 case 500 : {
-                    setError("obbs , there are some problems in our server , we will fix it soon , come backe later")
-                    setOpen(true)
-                    break
+                    setMessage('we have a problem in our server , come later')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 404 : {
+                    setMessage("we out of space , we can't find your destenation")
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
                 default : {
-                    setError(`obbs ,unknown error happend with status code ${error.status}`)
-                    setOpen(true)
-                    break
+                    setMessage("unkown error accoure : request falid with status code" + error.response.status)
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
-            }  
-        }
+              }
+            }else if(error.request){
+                setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+              setMessageType('error')
+              setOpen(true)
+            }else {
+                setMessage('unknow error : ' + error.message)
+              setMessageType('error')
+              setOpen(true)
+            }
+          }
         
     })
 
@@ -260,13 +268,6 @@ const EventCard = ({eventData , refetch}) => {
             </Button>
         </DialogActions>
         </Dialog>
-
-        <Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
-            <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-                {error}
-            </Alert>
-        </Snackbar>
-
     </>
   )
 }

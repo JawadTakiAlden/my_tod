@@ -32,6 +32,12 @@ function reducer(state, action) {
             token : ''
         }
       }
+      case 'SET_OPEN_SIDEBAR' : {
+        return {
+          ...state,
+          openSidebar : action.value
+      }
+      }
       default: {
         throw new Error(`Unhandled action type: ${action.type}`);
       }
@@ -43,7 +49,8 @@ function JawadAuthControllerProvider({ children }) {
     const initialState = {
       user : Cookies.get('_profile'),
       isAuth : Cookies.get('_isAuth'),
-      token : Cookies.get('_toddily_admin_token')
+      token : Cookies.get('_toddily_admin_token'),
+      openSidebar : false
     };
   
     const [controller, dispatch] = useReducer(reducer, initialState);
@@ -76,6 +83,8 @@ function JawadAuthControllerProvider({ children }) {
     dispatch({type : 'logout'})
   }
 
+  const setOpenSidebar = (dispatch, value) => dispatch({ type: "SET_OPEN_SIDEBAR", value });
+
   const RequireAuth = ({children}) => {
     const [controller , dispatch] = useContext(JawadAuth);
     const { isAuth } = controller
@@ -107,6 +116,7 @@ function JawadAuthControllerProvider({ children }) {
   export {
     JawadAuthControllerProvider,
     useJawadAuthController,
+    setOpenSidebar,
     login,
     logout,
     RequireAuth

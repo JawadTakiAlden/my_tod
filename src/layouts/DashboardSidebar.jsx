@@ -5,15 +5,19 @@ import { tokens } from '../assets/theme'
 import Logo from '../assets/images/logo.png'
 import { ChildFriendlyOutlined, ClassOutlined, CloseOutlined, DashboardOutlined, EscalatorWarning, EventOutlined, GolfCourseOutlined, ImageOutlined, ImportContactsOutlined, LeaderboardOutlined, MenuOutlined, PeopleOutlined, QuestionMarkOutlined, SchoolOutlined } from '@mui/icons-material'
 import {Link, useLocation} from 'react-router-dom'
+import { setOpenSidebar, useJawadAuthController } from '../context'
 
 const MyItem = ({ title, to, icon }) => {
   const location = useLocation()
-  const bla = 'jawad'
+  const [, dispatch] = useJawadAuthController()
   return (
     <MenuItem
       active={location.pathname ===  title.toLowerCase() || location.pathname.includes(title.toLowerCase())}
       icon={icon}
       component={<Link to={to} />}
+      onClick={() => {
+        setOpenSidebar(dispatch , false)
+      }}
     >
       <Typography
       >
@@ -28,17 +32,22 @@ const MyItem = ({ title, to, icon }) => {
 const DashboardSidebar = () => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
-  const [collabsed , setCollabsed] = useState(false)
+  const [controller] = useJawadAuthController()
   return (
     <Sidebar
-      collapsed = {collabsed}
-      breakPoint='md'
+      collapsed = {false}
       rootStyles={{
         borderRight : 'none',
+        position : 'fixed',
         borderLeft : 'none !important',
+        zIndex : '10',
+        backgroundColor : colors.blueAccent[900],
         height : '100vh',
-        position : 'sticky',
-        top : '0',
+        left : controller.openSidebar ? '5px' : '-250px',
+        // position : 'sticky',
+        top : '10px',
+        height : 'calc(100vh - 20px)',
+        borderRadius : '10px',
         [`.${sidebarClasses.container}`] : {
           borderRadius : '12px !important',
           backgroundColor : 'transparent',
@@ -59,63 +68,21 @@ const DashboardSidebar = () => {
       }}
     >
 
-      {
-        collabsed
-        ? (
-          <Box
-            sx={{
-              display : 'flex',
-              alignItems : 'center',
-              justifyContent : 'center',
-              marginBottom : '10px'
-            }}
-          >
-            <IconButton
-              onClick={() => setCollabsed(false)}
-            >
-              <MenuOutlined color='secondary' />
-            </IconButton>
-          </Box>
-        )
-        : (
-          <Box
-            sx={{
-              display : 'flex',
-              alignItems : 'center',
-              justifyContent : 'flex-end',
-            }}  
-          >
-            <IconButton
-              onClick={() => setCollabsed(true)}
-            >
-              <CloseOutlined color='secondary' />
-
-            </IconButton>
-          </Box>
-        )
-      }
-      {
-        !collabsed
-        ? (
-          <>
-            <Box
-              mb={'20px'}
-              sx={{
-                display :'flex',
-                alignItems : 'center',
-                flexDirection : 'column'
-              }}
-            >
-              <Box
-                width={'150px'}
-              >
-                <img style={{width : '100%'}} src={Logo} alt='logo' />
-              </Box>
-            </Box>
-          </>
-        )
-        : undefined
-      }
+      
+      <Box
+        mb={'20px'}
+        sx={{
+          display :'flex',
+          alignItems : 'center',
+          flexDirection : 'column'
+        }}
+      >
+        <Box
+          width={'150px'}
+        >
+          <img style={{width : '100%'}} src={Logo} alt='logo' />
+        </Box>
+      </Box>
 
       <Menu>
         <MyItem title={'Dashboard'} to={'/dashboard'} icon={<DashboardOutlined />} />

@@ -1,11 +1,10 @@
 import React from 'react'
 import * as Yup from 'yup'
 import Page from '../layouts/Page'
-import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { request } from '../api/request'
-import { useNavigate } from 'react-router'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
+import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
 
 const parentsColumns = [
     {
@@ -16,35 +15,40 @@ const parentsColumns = [
     {
         field : 'first_name',
         headerName : 'First Name',
-        width : 150,
+        minWidth : 120,
+        flex : 1,
         editable : true
         // flex : 1
     },
     {
         field : 'last_name',
         headerName : 'Last Name',
-        width : 150,
+        minWidth : 120,
+        flex : 1,
         editable : true
         // flex : 1
     },
     {
       field : 'username',
       headerName : 'Username',
-      width : 200,
-      // flex : 1
+      // width : 200,
+      minWidth : 120,
+      flex : 1
     },
     {
       field : 'phone',
       headerName : 'Phone',
-      width : 150,
-      editable : true
-      // flex : 1
+      // width : 150,
+      editable : true,
+      minWidth : 120,
+      flex : 1
     },
     {
         field : 'role',
         headerName : 'Role',
-        width : 150,
-        // flex : 1
+        // width : 150,
+        minWidth : 120,
+        flex : 1
     },
 ]
 
@@ -64,7 +68,6 @@ const getParentsFromServer = () => {
 }
 
 const Parents = () => {
-    const navigate = useNavigate()
     const {isLoading , isError , error , data , refetch } = useQuery({
         queryKey : ['get-parents-from-server'],
         queryFn : getParentsFromServer
@@ -75,16 +78,8 @@ const Parents = () => {
     }
     
     if(isError){
-      if(error.response.status === 401){
-        navigate('/auth/signin')
-      }else if(error.message === "Network Error"){
-        return 'network error'
-      }else{
-        refetch()
-      }
+      return <GetErrorHandler error={error} refetch={refetch} />
     }
-
-    console.log(data)
   return (
     <Page 
     name={'parents'} 
@@ -135,6 +130,7 @@ const Parents = () => {
         validationSchema={validationSchema}
         valuesShouldUpdate={['first_name' , 'last_name' , 'phone']}
         updateAPI={'/accounts'}
+        refetch={refetch}
     />
   )
 }

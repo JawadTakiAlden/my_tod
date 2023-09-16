@@ -1,9 +1,9 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ImageList, ImageListItem, Input, TextField, useMediaQuery, useTheme } from '@mui/material'
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ImageList, ImageListItem, Input, Snackbar, TextField, useMediaQuery, useTheme } from '@mui/material'
 import React, { useState } from 'react'
 import GridBox from '../components/GridBox'
 import GridItem from '../components/GridItem'
 import image from '../assets/images/5.jpg'
-import { AddOutlined, DeleteOutlined } from '@mui/icons-material'
+import { AddOutlined, DeleteOutlined, PlusOneOutlined } from '@mui/icons-material'
 import { tokens } from '../assets/theme'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -12,6 +12,8 @@ import { useNavigate, useParams } from 'react-router'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { baseURLImage, request } from '../api/request'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
+import AddImage from '../assets/images/add.png'
+import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
 
 
 const getEventImagsFromServer = (id) => {
@@ -20,6 +22,8 @@ const getEventImagsFromServer = (id) => {
   })
 }
 
+// let arr = [1,2,3,4,5,6,7,8,9]
+// console.log(arr.splice(0,5))
 
 const addEventImageToserver = (values) => {
   return request({
@@ -41,17 +45,24 @@ const deleteEventImageFromServer = (id) => {
   })
 }
 
+
 const Event = () => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const [isAddImageDialogOpen , setIsAddImageDialogOpen] = useState(false)
   const [isDeleteImageOpen , setIsDeleteImageOpen] = useState(false)
   const [clickedImage , setClickedImage] = useState()
-  const isNonMobile = useMediaQuery("(min-width:600px)");
+  const [openSnackbar , setOpenSnackbar] = useState(false)
+  const [message , setMessage] = useState("")
+  const [messageType , setMessageType] = useState("")
+  const isNonMobile = useMediaQuery("(min-width:600px)")
   const {eventID} = useParams()
-  const navigate = useNavigate()
 
   // dealing with APIs
+
+  const handelAlterClose = () => {
+    setOpenSnackbar(false)
+  }
 
   // get images for this event
   const eventImagesQuery = useQuery({
@@ -63,9 +74,56 @@ const Event = () => {
     mutationKey : ['add-event-image-to-server'],
     mutationFn : addEventImageToserver,
     onSuccess : () => {
+      setMessage('images added successfully')
+      setMessageType('success')
+      setOpenSnackbar(true)
       eventImagesQuery.refetch()
       AddImageDialogClose()
-    }
+    },
+    onError : (error) => {
+            if (error.response){
+              switch(error.response.status){
+                case 401 : {
+                    setMessage('you are not authorize to make this request')
+                  setMessageType('error')
+                  setOpenSnackbar(true)
+                  break
+                }
+                case 422 : {
+                    setMessage('problems with data you are entered')
+                  setMessageType('error')
+                  setOpenSnackbar(true)
+                  break
+                }
+                case 500 : {
+                    setMessage('we have a problem in our server , come later')
+                  setMessageType('error')
+                  setOpenSnackbar(true)
+                  break
+                }
+                case 404 : {
+                    setMessage("we out of space , we can't find your destenation")
+                  setMessageType('error')
+                  setOpenSnackbar(true)
+                  break
+                }
+                default : {
+                    setMessage("unkown error accoure : request falid with status code" + error.response.status)
+                  setMessageType('error')
+                  setOpenSnackbar(true)
+                  break
+                }
+              }
+            }else if(error.request){
+                setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+              setMessageType('error')
+              setOpenSnackbar(true)
+            }else {
+                setMessage('unknow error : ' + error.message)
+              setMessageType('error')
+              setOpenSnackbar(true)
+            }
+          }
   })
 
 
@@ -73,8 +131,55 @@ const Event = () => {
     mutationKey : ['delete-event-image-from-server'],
     mutationFn : deleteEventImageFromServer,
     onSuccess : () => {
+      setMessage('one image deleted successfully')
+      setMessageType('warning')
+      setOpenSnackbar(true)
       eventImagesQuery.refetch()
       deleteImageDialogClose()
+    },
+    onError : (error) => {
+      if (error.response){
+        switch(error.response.status){
+          case 401 : {
+              setMessage('you are not authorize to make this request')
+            setMessageType('error')
+            setOpenSnackbar(true)
+            break
+          }
+          case 422 : {
+              setMessage('problems with data you are entered')
+            setMessageType('error')
+            setOpenSnackbar(true)
+            break
+          }
+          case 500 : {
+              setMessage('we have a problem in our server , come later')
+            setMessageType('error')
+            setOpenSnackbar(true)
+            break
+          }
+          case 404 : {
+              setMessage("we out of space , we can't find your destenation")
+            setMessageType('error')
+            setOpenSnackbar(true)
+            break
+          }
+          default : {
+              setMessage("unkown error accoure : request falid with status code" + error.response.status)
+            setMessageType('error')
+            setOpenSnackbar(true)
+            break
+          }
+        }
+      }else if(error.request){
+          setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+        setMessageType('error')
+        setOpenSnackbar(true)
+      }else {
+          setMessage('unknow error : ' + error.message)
+        setMessageType('error')
+        setOpenSnackbar(true)
+      }
     }
   })
 
@@ -89,7 +194,35 @@ const Event = () => {
   const handleFormSubmit = (values) => {
     const data = {
       event_id : eventID,
-      images : [values.imageFile]
+      images : values.imageFile
+    }
+    let i = 0
+    if(values.imageFile.length > 5){
+      while( i < values.imageFile.length ){
+        if(i+5 <= values.imageFile.length){
+          let currentImages = [] ;
+          for(let j = i ; j < i+5 ; j ++){
+            currentImages[j] = values.imageFile[j]
+          }
+          const currentData = {
+            event_id : eventID,
+            images : currentImages
+          }
+          addNewImageMutation.mutate(currentData)
+          i+=5
+        }else{
+          let currentImages = [] ;
+          for(let j = i ; j < values.imageFile.length ; j ++){
+            currentImages[j] = values.imageFile[j]
+          }
+          const currentData = {
+            event_id : eventID,
+            images : currentImages
+          }
+          addNewImageMutation.mutate(currentData)
+          i+= values.imageFile.length - i
+        }
+      }
     }
     addNewImageMutation.mutate(data)
   }
@@ -108,54 +241,64 @@ const Event = () => {
   }
 
 
-  if(eventImagesQuery.isLoading){
+  if(eventImagesQuery.isLoading || addNewImageMutation.isLoading){
     return <CubeLoader />
   }
 
   if(eventImagesQuery.isError){
-    if(eventImagesQuery.error.response){
-      if(eventImagesQuery.error.response.status === 401){
-        return navigate('/auth/signin')
-      }
-    }else if(eventImagesQuery.error.request){
-      return "no response receved from server"
-    }else{
-      return "unknown error with message" + eventImagesQuery.error.message
-    }
+    return <GetErrorHandler error={eventImagesQuery.error} refetch={eventImagesQuery.refetch} />
   }
 
   const eventInformation = eventImagesQuery.data.data.event
 
-  console.log(eventInformation)
-
   return (
     <>
     <Box>
+    
     <ImageList variant="masonry" cols={3} gap={8}>
-      <ImageListItem>
+      <ImageListItem
+        sx={{
+          position : 'relative'
+        }}
+      >
         <Box
+          sx={{
+            width : '100%',
+            height : '100%',
+            position : 'absolute',
+            left : '0',
+            top : '0',
+            display : 'flex',
+            alignItems : 'center',
+            justifyContent : 'center',
+            backgroundColor : colors.indigoAccent[500],
+            borderRadius : '6px',
+            cursor : 'pointer',
+            transition : '0.3s',
+            "&:hover" : {
+              backgroundColor : colors.indigoAccent[600],
+            }
+          }}
+          onClick={AddImageDialogOpen}
+        >
+          <AddOutlined 
               sx={{
-                height : '250px',
-                borderRadius : '8px',
-                display : 'flex',
-                alignItems : 'center',
-                justifyContent : 'center',
-                boxShadow : `2px 2px 10px -5px ${colors.indigoAccent[400]}`,
-                transition : '0.3s',
-                cursor : 'pointer',
-                "&:hover" : {
-                  backgroundColor : colors.primary[400],
-                }
+                color : '#fff',
+                fontSize : '100px'
               }}
-              onClick={AddImageDialogOpen}
-            >
-              <AddOutlined 
-                sx={{
-                  fontSize : '80px',
-                }}
-              />
-            </Box>
-        </ImageListItem>
+          />
+        </Box>
+        <img
+          src={`${AddImage}`}
+          srcSet={`${AddImage}`}
+          alt={'add'}
+          loading="lazy"
+          style={{
+            borderRadius : '6px',
+            width : '150px',
+          }}
+        />
+      </ImageListItem>
         {eventInformation.event_images.map((item) => (
           <ImageListItem 
             key={item.src}
@@ -197,79 +340,6 @@ const Event = () => {
           </ImageListItem>
         ))}
       </ImageList>
-      {/* <GridBox spacing={2}>
-        <GridItem xs={12} sm={6} md={4} lg={2}>
-          <Box
-            sx={{
-              height : '250px',
-              borderRadius : '8px',
-              display : 'flex',
-              alignItems : 'center',
-              justifyContent : 'center',
-              boxShadow : `2px 2px 10px -5px ${colors.indigoAccent[400]}`,
-              transition : '0.3s',
-              cursor : 'pointer',
-              "&:hover" : {
-                backgroundColor : colors.primary[400],
-              }
-            }}
-            onClick={AddImageDialogOpen}
-          >
-            <AddOutlined 
-              sx={{
-                fontSize : '80px',
-              }}
-            />
-          </Box>
-        </GridItem>
-        {
-          eventInformation.event_images.map(image => (
-            <GridItem xs={12} sm={6} md={4} lg={2}>
-              <a href={`http://127.0.0.1:8000${image.src}`} target='_blank'>
-              <Box
-                sx={{
-                  backgroundImage : `url(http://127.0.0.1:8000${image.src})`,
-                  backgroundRepeat : 'no-repeat',
-                  backgroundSize : 'cover',
-                  backgroundPosition : 'center',
-                  height : '250px',
-                  borderRadius : '8px',
-                  position : 'relative',
-                  overflow : 'hidden',
-                  "&:hover .delete-event-image-box" : {
-                    bottom : '10px'
-                  }
-                }}
-              >
-                <Box
-                  sx={{
-                    height : '20px',
-                    width : '100%',
-                    display : 'flex',
-                    alignItems : 'center',
-                    justifyContent : 'center',
-                    bottom : '-100%',
-                    transition : '0.2s',
-                    position : 'absolute',
-                    zIndex : 1,
-                  }}
-                  className={'delete-event-image-box'}
-                >
-                  <IconButton
-                    color='error'
-                    onClick={deleteImageDialogOpen}
-                  >
-                  <DeleteOutlined 
-                    // color='error'
-                  />
-                  </IconButton>
-                </Box>
-              </Box>
-              </a>
-            </GridItem>
-          ))
-        }
-      </GridBox> */}
     </Box>
     <Dialog
         open={isAddImageDialogOpen}
@@ -323,9 +393,13 @@ const Event = () => {
                     type="file"
                     label="Image"
                     onBlur={handleBlur}
+                    multiple
                     onChange={(e) => {
-                      setFieldValue('imageFile' , e.currentTarget.files[0])
+                      setFieldValue('imageFile' , e.currentTarget.files)
                       handleChange(e)
+                    }}
+                    inputProps={{
+                      multiple : true
                     }}
                     value={values.image}
                     name="image"
@@ -384,6 +458,11 @@ const Event = () => {
           
         </DialogActions>
     </Dialog>
+    <Snackbar open={openSnackbar} autoHideDuration={4000} onClose={handelAlterClose}>
+            <Alert onClose={handelAlterClose} severity={messageType} sx={{ width: '100%' }}>
+                {message}
+            </Alert>
+        </Snackbar>
     </>
   )
 }

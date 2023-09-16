@@ -171,8 +171,9 @@ const ChildInformation = () => {
                     key={data.image}
                     sx={{
                     position : 'relative',
-                    borderRadius : '6px'
-                    
+                    borderRadius : '6px',
+                    maxWidth : '60%',
+                    margin : '0 auto'
                     }}
                     
                 >

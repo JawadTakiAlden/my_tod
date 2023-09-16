@@ -6,6 +6,7 @@ import CubeLoader from '../components/CubeLoader/CubeLoader'
 import * as Yup from 'yup'
 import { request } from '../api/request'
 import Page from '../layouts/Page'
+import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
 
 const cloumns = [
     {
@@ -17,12 +18,14 @@ const cloumns = [
         field : 'from',
         headerName : 'From',
         type : 'number',
+        flex : 1,
         editable : true,
     },
     {
         field : 'to',
         headerName : 'To',
         type : 'number',
+        flex : 1,
         editable : true,
     }
   ]
@@ -40,27 +43,18 @@ const validationSchema = Yup.object({
 
 
 const AgeSection = () => {
-  const navigate = useNavigate()
     const ageSectionsQuery = useQuery({
         queryKey : ['get-age-sections-from-server'],
         queryFn : getAgeSectionsFromServer
     })
 
     if(ageSectionsQuery.isLoading){
-        return <CubeLoader />
-      }
-    
-      if(ageSectionsQuery.isError){
-        if(ageSectionsQuery.error.response){
-          if(ageSectionsQuery.error.response.status === 401){
-            return navigate('/auth/signin')
-          }
-        }else if(ageSectionsQuery.error.request){
-          return "no response receved from server"
-        }else{
-          return "unknown error with message" + ageSectionsQuery.error.message
-        }
-      }
+      return <CubeLoader />
+    }
+  
+    if(ageSectionsQuery.isError){
+      return <GetErrorHandler error={ageSectionsQuery.error} refetch={ageSectionsQuery.refetch} />
+    }
   return (
     <Page 
     name={'age-sections'} 
@@ -92,6 +86,7 @@ const AgeSection = () => {
         valuesShouldUpdate={['from' , 'to']}
         updateAPI={'/age-section'}
         withNavigate={false}
+        refetch={ageSectionsQuery.refetch}
     />
   )
 }

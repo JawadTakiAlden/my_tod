@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { request } from '../api/request'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
 import { useNavigate } from 'react-router'
+import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
 
 const validationSchema = Yup.object({
   name : Yup.string().required('class name field is required'),
@@ -22,28 +23,29 @@ const classColumns = [
   {
       field : 'name',
       headerName : 'Class Name',
-      width : 150,
+      flex : 1,
       editable : true
       // flex : 1
   },
   {
       field : 'age_section',
       headerName : 'Age Section',
-      width : 150,
+      flex : 1,
       valueGetter : (params) => {
         return 'from ' + params.row.age_section.from + ' to ' + params.row.age_section.to 
       }
       // flex : 1
   },
-  {
-      field : 'teacher_name',
-      headerName : 'Teacher Name',
-      width : 150,
-      valueGetter : (params) => {
-        return params.row.teacher.first_name + ' ' + params.row.teacher.last_name 
-      }
-      // flex : 1
-  },
+  // {
+  //     field : 'teacher_name',
+  //     headerName : 'Teacher Name',
+  //     flex : 1,
+  //     valueGetter : (params) => {
+  //       console.log(params.row)
+  //       return params.row.teacher.first_name + ' ' + params.row.teacher.last_name 
+  //     }
+  //     // flex : 1
+  // },
 ]
 
 const getClassesFromServer = () => {
@@ -68,6 +70,7 @@ const getAgeSectionFromServer = () => {
 }
 
 const orginizeData = (values) => {
+  console.log(values)
   const newValues = values.map(valuesObject => (
     {
       name : valuesObject.first_name + ' ' +valuesObject.last_name,
@@ -89,7 +92,6 @@ const OrgnizeAgeSectionData = (values) => {
 }
 
 const Classes = () => {
-  const navigate = useNavigate()
   const {isLoading , isError , error , data , refetch} = useQuery({
     queryKey : ['get-classes-from-server'],
     queryFn : getClassesFromServer
@@ -106,28 +108,25 @@ const Classes = () => {
   })
   
   if(isLoading || teachersQuery.isLoading || ageSectionQuery.isLoading){
-      return <CubeLoader />
-    }
-    
-    if(isError || teachersQuery.isError || ageSectionQuery.isError){
-      if(error?.response?.status === 401 || teachersQuery?.error?.response?.status === 401 || ageSectionQuery?.error?.response?.status === 401){
-        navigate('/auth/signin')
-      }else if(error?.message === "Network Error" || teachersQuery?.error?.message === "Network Error" || ageSectionQuery?.error?.message === "Network Error"){
-        return 'newtwork error'
-      }else{
-        refetch()
-        teachersQuery.refetch()
-        ageSectionQuery.refetch()
-      }
-    }
+    return <CubeLoader />
+  }
 
-    const teachers = teachersQuery.data.data.data.filter((obj) => {
-      return obj.role === 'teacher'  
-    })
+  if(isError){
+    return <GetErrorHandler error={error} refetch={refetch} />
+  }
+  if(teachersQuery.isError){
+    return <GetErrorHandler error={teachersQuery.error} refetch={teachersQuery.refetch} />
+  }
+  if(ageSectionQuery.isError){
+    return <GetErrorHandler error={ageSectionQuery.error} refetch={ageSectionQuery.refetch} />
+  }
+  
+  const teachers = teachersQuery.data.data.data.filter((obj) => {
+    return obj.role === 'teacher'  
+  })
 
-    const ageSection = ageSectionQuery.data.data.data
+  const ageSection = ageSectionQuery.data.data.data
 
-    console.log(data.data)
   return (
     <Page 
       name={'class'} 
@@ -169,6 +168,7 @@ const Classes = () => {
       validationSchema={validationSchema}
       valuesShouldUpdate={['name']}
       updateAPI={'/classroom'}
+      refetch={refetch}
     />
   )
 }

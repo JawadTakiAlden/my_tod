@@ -9,6 +9,7 @@ import { tokens } from '../assets/theme';
 import * as Yup from 'yup'
 import { Formik } from 'formik';
 import { DeleteOutlined } from '@mui/icons-material';
+import { GetErrorHandler } from '../helper/GetErrorHandlerHelper';
 
 const addImageToServer = (file) => {
     return request({
@@ -40,7 +41,8 @@ const PublicImages = () => {
     const colors = tokens(theme.palette.mode)
     const [open, setOpen] = useState(false);
     const [openSnackbar , setOpenSnackbar] = useState(false)
-    const [error , setError] = useState("")
+    const [message , setMessage] = useState("")
+    const [messageType , setMessageType] = useState("")
     const [deleteDialogOpen , setDeleteDialogOpen] = useState(false)
     const [clickedImage , setClickedImage] = useState()
 
@@ -79,36 +81,53 @@ const PublicImages = () => {
       mutationFn : deleteImageFromServer,
       onSuccess : (data) => {
         getPublicImagesFromServerQuery.refetch()
+        setMessage('an image deleted successfully')
+          setMessageType('warning')
+          setOpenSnackbar(true)
       },
-        onError : (error) => {
-          if(!error?.response && error?.message === 'Network Error'){
-              setError("obbs , you have internet connection problems")
-              setOpenSnackbar(true)
-              return
-          }
+      onError : (error) => {
+        if (error.response){
           switch(error.response.status){
-              case 404 : {
-                  setError("obbs , you're out of space , the destenation not found in our system")
-                  setOpenSnackbar(true)
-                  break ;
-              }
-              case 401 : {
-                  setError(`you're not authorize to create new question and answer in our system`)
-                  setOpenSnackbar(true)
-                  break ;
-              }
-  
-              case 500 : {
-                  setError("obbs , there are some problems in our server , we will fix it soon , come backe later")
-                  setOpenSnackbar(true)
-                  break
-              }
-              default : {
-                  setError(`obbs ,unknown error happend with status code ${error.status}`)
-                  setOpenSnackbar(true)
-                  break
-              }
-          }  
+            case 401 : {
+                setMessage('you are not authorize to make this request')
+              setMessageType('error')
+              setOpenSnackbar(true)
+              break
+            }
+            case 422 : {
+                setMessage('problems with data you are entered')
+              setMessageType('error')
+              setOpenSnackbar(true)
+              break
+            }
+            case 500 : {
+                setMessage('we have a problem in our server , come later')
+              setMessageType('error')
+              setOpenSnackbar(true)
+              break
+            }
+            case 404 : {
+                setMessage("we out of space , we can't find your destenation")
+              setMessageType('error')
+              setOpenSnackbar(true)
+              break
+            }
+            default : {
+                setMessage("unkown error accoure : request falid with status code" + error.response.status)
+              setMessageType('error')
+              setOpenSnackbar(true)
+              break
+            }
+          }
+        }else if(error.request){
+            setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+          setMessageType('error')
+          setOpenSnackbar(true)
+        }else {
+            setMessage('unknow error : ' + error.message)
+          setMessageType('error')
+          setOpenSnackbar(true)
+        }
       }
     })
 
@@ -117,43 +136,54 @@ const PublicImages = () => {
         mutationFn : addImageToServer,
         onSuccess : (data) => {
           getPublicImagesFromServerQuery.refetch()
+          setMessage('new image added successfully')
+          setMessageType('success')
+          setOpenSnackbar(true)
           },
           onError : (error) => {
-            if(!error?.response && error?.message === 'Network Error'){
-                setError("obbs , you have internet connection problems")
-                setOpenSnackbar(true)
-                return
-            }
-            switch(error.response.status){
-                case 404 : {
-                    setError("obbs , you're out of space , the destenation not found in our system")
-                    setOpenSnackbar(true)
-                    break ;
-                }
+            if (error.response){
+              switch(error.response.status){
                 case 401 : {
-                    setError(`you're not authorize to create new question and answer in our system`)
-                    setOpenSnackbar(true)
-                    break ;
-                }
-    
-                case 401 : {
-                  setError(`check your entered data , there some mistake with it`)
+                    setMessage('you are not authorize to make this request')
+                  setMessageType('error')
                   setOpenSnackbar(true)
-                  break ;
+                  break
                 }
-    
+                case 422 : {
+                    setMessage('problems with data you are entered')
+                  setMessageType('error')
+                  setOpenSnackbar(true)
+                  break
+                }
                 case 500 : {
-                    setError("obbs , there are some problems in our server , we will fix it soon , come backe later")
-                    setOpenSnackbar(true)
-                    break
+                    setMessage('we have a problem in our server , come later')
+                  setMessageType('error')
+                  setOpenSnackbar(true)
+                  break
+                }
+                case 404 : {
+                    setMessage("we out of space , we can't find your destenation")
+                  setMessageType('error')
+                  setOpenSnackbar(true)
+                  break
                 }
                 default : {
-                    setError(`obbs ,unknown error happend with status code ${error.status}`)
-                    setOpenSnackbar(true)
-                    break
+                    setMessage("unkown error accoure : request falid with status code" + error.response.status)
+                  setMessageType('error')
+                  setOpenSnackbar(true)
+                  break
                 }
-            }  
-        }
+              }
+            }else if(error.request){
+                setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+              setMessageType('error')
+              setOpenSnackbar(true)
+            }else {
+                setMessage('unknow error : ' + error.message)
+              setMessageType('error')
+              setOpenSnackbar(true)
+            }
+          }
     })
 
     const addImageFornHanderler = (values) => {
@@ -165,19 +195,12 @@ const PublicImages = () => {
 
     }
     if(getPublicImagesFromServerQuery.isLoading || addImageMutation.isLoading || deleteImageMutation.isLoading){
-        return <CubeLoader />
-      }
+      return <CubeLoader />
+    }
   
-      if(getPublicImagesFromServerQuery.isError){
-        if(getPublicImagesFromServerQuery?.error?.response?.status !== 401){
-            getPublicImagesFromServerQuery.refetch()
-            return
-        }else{
-            return navigate('/auth/signin')
-        }
-      }
-
-      console.log(getPublicImagesFromServerQuery.data.data.posts)
+    if(getPublicImagesFromServerQuery.isError){
+      return <GetErrorHandler error={getPublicImagesFromServerQuery.error} refetch={getPublicImagesFromServerQuery.refetch} />
+    }
 
   return (
     <>
@@ -198,9 +221,9 @@ const PublicImages = () => {
         )
       }
       <ImageList variant="masonry" cols={3} gap={8}>
-        {getPublicImagesFromServerQuery.data.data.posts.map((item) => (
+        {getPublicImagesFromServerQuery.data.data.posts.map((item,i) => (
           <ImageListItem 
-            key={item.img}
+            key={i}
             sx={{
               position : 'relative',
               borderRadius : '6px'
@@ -233,7 +256,7 @@ const PublicImages = () => {
               alt={item.title}
               loading="lazy"
               style={{
-                borderRadius : '6px'
+                borderRadius : '0 6px 6px 6px'
               }}
             />
           </ImageListItem>
@@ -242,8 +265,8 @@ const PublicImages = () => {
     </Box>
     </Box>
     <Snackbar open={openSnackbar} autoHideDuration={4000} onClose={handelAlterClose}>
-            <Alert onClose={handelAlterClose} severity="error" sx={{ width: '100%' }}>
-                {error}
+            <Alert onClose={handelAlterClose} severity={messageType} sx={{ width: '100%' }}>
+                {message}
             </Alert>
         </Snackbar>
     <Dialog 
@@ -284,8 +307,11 @@ const PublicImages = () => {
                             label="Image"
                             onBlur={handleBlur}
                             onChange={(e) => {
-                                setFieldValue('imageFile' , e.currentTarget.files[0])
+                                setFieldValue('imageFile' , e.currentTarget.files)
                                 handleChange(e)
+                            }}
+                            inputProps={{
+                              multiple : true
                             }}
                             value={values.image}
                             name="image"

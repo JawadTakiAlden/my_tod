@@ -85,13 +85,14 @@ function CustomNoRowsOverlay() {
   );
 }
 
-const Page = ({columns , data , name , link , formInputs , validationSchema , valuesShouldUpdate , initialValues  , updateAPI , withNavigate = true}) => {
+const Page = ({columns , data , name , link , formInputs , validationSchema , valuesShouldUpdate , initialValues  , updateAPI , withNavigate = true , refetch}) => {
     const [clickedRow , setClickedRow] = useState()
     const [deleteRowDialogOpen , setDeleteRowDialogOpen] = useState(false)
     const [fromOpen , setFormOpen] = useState(false)
     const [rowId , setRowId] = useState(null)
     const [open , setOpen] = useState(false)
-    const [error , setError] = useState("")
+    const [message , setMessage] = useState("")
+    const [messageType , setMessageType] = useState("")
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
     const isNoneMobile = useMediaQuery('(min-width : 600px')
@@ -130,45 +131,57 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
     const addToServerMutation = useMutation({
         mutationKey : [`add-${name.slice(-1,1)}-to-server`],
         mutationFn : addToServer,
-        onSuccess : (data) => {
-            console.log(data)
+        onSuccess : () => {
+            refetch()
+            setMessage('one row added successfully')
+            setMessageType('success')
+            setOpen(true)
+            setFormOpen(false)
         },
         onError : (error) => {
-            if(!error.response || error.message === 'Network Error'){
-                setError("obbs , you have internet connection problems")
-                setOpen(true)
-                return
-            }
-            switch(error.response.status){
-                case 404 : {
-                    setError("obbs , you're out of space , the destenation not found in our system")
-                    setOpen(true)
-                    break ;
-                }
+            if (error.response){
+              switch(error.response.status){
                 case 401 : {
-                    setError(`you're not authorize to create new ${name.slice(-1 , 1)} in our system`)
-                    setOpen(true)
-                    break ;
+                    setMessage('you are not authorize to make this request')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
-
                 case 422 : {
-                    setError(`you're make some mistake with data entered by you , check it and try again`)
-                    setOpen(true)
-                    break ;
+                    setMessage('problems with data you are entered')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
-
                 case 500 : {
-                    setError("obbs , there are some problems in our server , we will fix it soon , come backe later")
-                    setOpen(true)
-                    break
+                    setMessage('we have a problem in our server , come later')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 404 : {
+                    setMessage("we out of space , we can't find your destenation")
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
                 default : {
-                    setError(`obbs ,unknown error happend with status code ${error.response.status}`)
-                    setOpen(true)
-                    break
+                    setMessage("unkown error accoure : request falid with status code" + error.response.status)
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
-            }  
-        }
+              }
+            }else if(error.request){
+                setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+              setMessageType('error')
+              setOpen(true)
+            }else {
+                setMessage('unknow error : ' + error.message)
+              setMessageType('error')
+              setOpen(true)
+            }
+          }
     })
 
 
@@ -182,41 +195,58 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
     }
 
     const deleteFromServerMutation = useMutation({
-        mutationKey : [`delete-${name.slice(-1 , 1)}-from-server`],
+        mutationKey : [`delete-${name.slice(-1 , 1)}-${rowId}-from-server`],
         mutationFn : deleteFromServer,
-        onSuccess : (data) => {
-            console.log(data)
+        onSuccess : () => {
+            refetch()
+            setMessage('one row deleted successfully')
+            setMessageType('warning')
+            setOpen(true)
         },
         onError : (error) => {
-            if(!error.response || error.message === 'Network Error'){
-                setError("obbs , you have internet connection problems")
-                setOpen(true)
-                return
-            }
-            switch(error.response.status){
-                case 404 : {
-                    setError("obbs , you're out of space , the destenation not found in our system")
-                    setOpen(true)
-                    break ;
-                }
+            if (error.response){
+              switch(error.response.status){
                 case 401 : {
-                    setError(`you're not authorize to create new ${name.slice(-1 , 1)} in our system`)
-                    setOpen(true)
-                    break ;
+                    setMessage('you are not authorize to make this request')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
-
+                case 422 : {
+                    setMessage('problems with data you are entered')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
                 case 500 : {
-                    setError("obbs , there are some problems in our server , we will fix it soon , come backe later")
-                    setOpen(true)
-                    break
+                    setMessage('we have a problem in our server , come later')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 404 : {
+                    setMessage("we out of space , we can't find your destenation")
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
                 default : {
-                    setError(`obbs ,unknown error happend with status code ${error.status}`)
-                    setOpen(true)
-                    break
+                    setMessage("unkown error accoure : request falid with status code" + error.response.status)
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
-            }  
-        }
+              }
+            }else if(error.request){
+                setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+              setMessageType('error')
+              setOpen(true)
+            }else {
+                setMessage('unknow error : ' + error.message)
+              setMessageType('error')
+              setOpen(true)
+            }
+          }
     })
 
     // end working with backend logic
@@ -262,7 +292,7 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                                 </IconButton>
                             )
                         }
-                        <SaveAction {...{params , rowId , setRowId , name , valuesShouldUpdate , updateAPI}} />
+                        <SaveAction {...{params , rowId , setRowId , name , valuesShouldUpdate , updateAPI , setMessage , setMessageType , refetch , setOpen}} />
                         <IconButton
                             onClick={() => onDeleteRowDialogOpen(params.row.id)}
                         >
@@ -297,92 +327,17 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
     const closeAddForm = () => {
         setFormOpen(false)
     }
-
-    // const initial = {}
-
-    // formInputs.map(input => {
-    //     initial[input.name] = input.initialValues
-    //     if(input.type === 'file'){
-    //         initial.imageFile = ''
-    //     }
-    // })
-
-    // console.log(initial)
-    // const InputFields = ({handleBlur , handleChange , touched , errors , values , setFieldValue}) => {
-
-    //     const fields = formInputs.map((input , i) => {
-    //         initial[input.name] = input.initialValues
-    //         if(input.type === 'select'){
-    //             return <Select
-    //                 value={values[input.name]}
-    //                 onChange={handleChange}
-    //                 autoWidth
-    //                 label="Role"
-    //                 name={input.name}
-    //             >
-    //                 {
-    //                     input.valueOptions.map((valueObj  , i)=> (
-    //                         <MenuItem value={valueObj.value} key={i}>{valueObj.name}</MenuItem>
-    //                     ))
-    //                 }
-    //             </Select>
-    //         }
-
-    //         if(input.type === 'file'){
-    //             return <TextField 
-    //             key={i}
-    //             fullWidth={input.fullWidth}
-    //             variant="filled"
-    //             type={input.type}
-    //             label={input.lable}
-    //             onBlur={handleBlur}
-    //             onChange={(e) => {
-    //                 setFieldValue('imageFile' , e.currentTarget.files[0])
-    //                 handleChange(e)
-    //             }}
-    //             value={values[input.name]}
-    //             name={input.name}
-    //             error={!!touched[input.name] && !!errors[input.name]}
-    //             helperText={touched[input.name] && errors[input.name]}
-    //             sx={{ 
-    //                 gridColumn: "span 2",
-    //             }}
-    //         />
-    //         }
-
-
-    //         return (
-    //             <TextField 
-    //                 key={i}
-    //                 fullWidth={input.fullWidth}
-    //                 variant="filled"
-    //                 type={input.type}
-    //                 label={input.lable}
-    //                 onBlur={handleBlur}
-    //                 onChange={handleChange}
-    //                 value={values[input.name]}
-    //                 name={input.name}
-    //                 error={!!touched[input.name] && !!errors[input.name]}
-    //                 helperText={touched[input.name] && errors[input.name]}
-    //                 sx={{ 
-    //                     gridColumn: "span 2",
-    //                 }}
-    //             />
-    //         )
-    //     })
-
-    //     return fields
-    // }
-
-    
-
     // loading while requests done
     if(addToServerMutation.isLoading || deleteFromServerMutation.isLoading){
         return <CubeLoader />
     }
 
   return (
-    <>
+    <Box
+        sx={{
+            width : '100%'
+        }}
+    >
         <Button
             color='secondary'
             sx={{
@@ -564,8 +519,7 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
         <Box 
       sx={{ 
          height : '500px',
-         maxWidth : '100%',
-         overflowX : 'auto'
+         width : '100%',
       }}
     >
       <DataGrid
@@ -644,11 +598,11 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
         </DialogActions>
         </Dialog>
         <Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
-            <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-                {error}
+            <Alert onClose={handleClose} severity={messageType} sx={{ width: '100%' }}>
+                {message}
             </Alert>
         </Snackbar>
-    </>
+    </Box>
   )
 }
 

@@ -11,6 +11,7 @@ import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { request } from '../api/request'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
+import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
 
 
 const getEeventFromServer = () => {
@@ -38,7 +39,8 @@ const Events = () => {
     const colors = tokens(theme.palette.mode)
     const [addEventDialogOpen , setAddEventDialogOpen] = useState(false)
     const [open , setOpen] = useState(false)
-    const [error , setError] = useState("")
+    const [message , setMessage] = useState("")
+    const [messageType , setMessageType] = useState("")
     const onAddEventDialogOpen = () => {
         setAddEventDialogOpen(true)
     }
@@ -66,42 +68,54 @@ const Events = () => {
         mutationFn : createNewEventInServer,
         onSuccess : (data) => {
             events.refetch()
+            setMessage('new event added successfully')
+            setMessageType('success')
+            setOpen(true)
         },
         onError : (error) => {
-            if(!error.response || error.message === 'Network Error'){
-                setError("obbs , you have internet connection problems")
-                setOpen(true)
-                return
-            }
-            switch(error.response.status){
-                case 404 : {
-                    setError("obbs , you're out of space , the destenation not found in our system")
-                    setOpen(true)
-                    break ;
-                }
+            if (error.response){
+              switch(error.response.status){
                 case 401 : {
-                    setError("you're not authorize to create new event in our system")
-                    setOpen(true)
-                    break ;
-                }
-
-                case 500 : {
-                    setError("obbs , there are some problems in our server , we will fix it soon , come backe later")
-                    setOpen(true)
-                    break
+                    setMessage('you are not authorize to make this request')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
                 case 422 : {
-                    setError("obbs , may you are making some mistake in your entered data")
-                    setOpen(true)
-                    break
+                    setMessage('problems with data you are entered')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 500 : {
+                    setMessage('we have a problem in our server , come later')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 404 : {
+                    setMessage("we out of space , we can't find your destenation")
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
                 default : {
-                    setError(`obbs ,unknown error happend with status code ${error.status}`)
-                    setOpen(true)
-                    break
+                    setMessage("unkown error accoure : request falid with status code" + error.response.status)
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
-            }  
-        }
+              }
+            }else if(error.request){
+                setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+              setMessageType('error')
+              setOpen(true)
+            }else {
+                setMessage('unknow error : ' + error.message)
+              setMessageType('error')
+              setOpen(true)
+            }
+          }
     })
 
     const handleFormSubmit = (values) => {
@@ -119,12 +133,7 @@ const Events = () => {
       }
 
       if(events.isError){
-        if(events.error.response.status !== 401){
-            events.refetch()
-            return
-        }else{
-            return <Typography color={'seashell'} variant='h1'>error</Typography>
-        }
+        return <GetErrorHandler error={events.error} refetch={events.refetch} />
       }
 
   return (
@@ -148,7 +157,7 @@ const Events = () => {
             {
                     events?.data?.data?.events?.map(event => (
                     <GridItem xs={12} sm={6} md={4} lg={3}>
-                        <EventCard eventData={event} refetch={events.refetch} />
+                        <EventCard eventData={event} refetch={events.refetch} setMessage={setMessage} setMessageType={setMessageType} setOpen={setOpen} />
                     </GridItem>
                 ))
             }
@@ -248,8 +257,8 @@ const Events = () => {
         </DialogActions>
         </Dialog>
         <Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
-            <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-                {error}
+            <Alert onClose={handleClose} severity={messageType} sx={{ width: '100%' }}>
+                {message}
             </Alert>
         </Snackbar>
         </>

@@ -13,6 +13,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { request } from '../api/request'
 import { useNavigate } from 'react-router'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
+import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
 
 const getStatusFromServer = () => {
     return request({
@@ -38,9 +39,9 @@ const Status = () => {
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
     const [addStatusDialogOpen , setAddStatusDialogOpen] = useState(false)
-    const [openSnackbar , setOpenSnackbar] = useState(false)
-    const [error , setError] = useState("")
-    const navigate = useNavigate()
+    const [open , setOpen] = useState(false)
+    const [message , setMessage] = useState("")
+    const [messageType , setMessageType] = useState("")
     const handleFormSubmit = (values) => {
         addStatusMutation.mutate(values)
         onAddStatusDialogClose()
@@ -53,52 +54,63 @@ const Status = () => {
       }
 
       const handelAlterClose = () => {
-        setOpenSnackbar(false)
+        setOpen(false)
       }
 
 
       const addStatusMutation = useMutation({
         mutationKey : ['add-new-status-to-server'],
         mutationFn : addStatusToServer,
-        onSuccess : (data) => {
+        onSuccess : () => {
             getStatusQuery.refetch()
+            setMessage('new status added successfully')
+            setMessageType('success')
+            setOpen(true)
             },
             onError : (error) => {
-              if(!error?.response && error?.message === 'Network Error'){
-                  setError("obbs , you have internet connection problems")
-                  setOpenSnackbar(true)
-                  return
+                if (error.response){
+                  switch(error.response.status){
+                    case 401 : {
+                        setMessage('you are not authorize to make this request')
+                      setMessageType('error')
+                      setOpen(true)
+                      break
+                    }
+                    case 422 : {
+                        setMessage('problems with data you are entered')
+                      setMessageType('error')
+                      setOpen(true)
+                      break
+                    }
+                    case 500 : {
+                        setMessage('we have a problem in our server , come later')
+                      setMessageType('error')
+                      setOpen(true)
+                      break
+                    }
+                    case 404 : {
+                        setMessage("we out of space , we can't find your destenation")
+                      setMessageType('error')
+                      setOpen(true)
+                      break
+                    }
+                    default : {
+                        setMessage("unkown error accoure : request falid with status code" + error.response.status)
+                      setMessageType('error')
+                      setOpen(true)
+                      break
+                    }
+                  }
+                }else if(error.request){
+                    setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+                  setMessageType('error')
+                  setOpen(true)
+                }else {
+                    setMessage('unknow error : ' + error.message)
+                  setMessageType('error')
+                  setOpen(true)
+                }
               }
-              switch(error.response.status){
-                  case 404 : {
-                      setError("obbs , you're out of space , the destenation not found in our system")
-                      setOpenSnackbar(true)
-                      break ;
-                  }
-                  case 401 : {
-                      setError(`you're not authorize to create new question and answer in our system`)
-                      setOpenSnackbar(true)
-                      break ;
-                  }
-      
-                  case 422 : {
-                    setError(`check your entered data , there are some mistake`)
-                    setOpenSnackbar(true)
-                    break ;
-                  }
-      
-                  case 500 : {
-                      setError("obbs , there are some problems in our server , we will fix it soon , come backe later")
-                      setOpenSnackbar(true)
-                      break
-                  }
-                  default : {
-                      setError(`obbs ,unknown error happend with status code ${error.status}`)
-                      setOpenSnackbar(true)
-                      break
-                  }
-              }  
-          }
 
       })
 
@@ -113,20 +125,16 @@ const Status = () => {
       })
 
 
-      if(getStatusQuery.isLoading || getAgeSectionsQuery.isLoading){
+      if(getStatusQuery.isLoading || getAgeSectionsQuery.isLoading || addStatusMutation.isLoading){
         return <CubeLoader />
       }
-    
-      if(getStatusQuery.isError || getAgeSectionsQuery.isError){
-        if(getStatusQuery.error.response.status === 401){
-          navigate('/auth/signin')
-        }else{
-            getStatusQuery.refetch()
-            getAgeSectionsQuery.refetch()
-        }
-      }
 
-      console.log(getStatusQuery.data.data)
+      if(getStatusQuery.isError){
+        return <GetErrorHandler error={getStatusQuery.error} refetch={getStatusQuery.refetch} />
+      }
+      if(getAgeSectionsQuery.isError){
+        return <GetErrorHandler error={getAgeSectionsQuery.error} refetch={getAgeSectionsQuery.refetch} />
+      }
   return (
     <>
     <Box>
@@ -137,15 +145,15 @@ const Status = () => {
             {
                 getStatusQuery.data.data.map((status) => (        
                     <GridItem key={status.id} xs={12} sm={6} md={4} lg={3}>
-                        <StatusCard2 data={status} ageSections={getAgeSectionsQuery.data.data.data} />
+                        <StatusCard2 data={status} ageSections={getAgeSectionsQuery.data.data.data} setMessage={setMessage} setMessageType={setMessageType} setOpen={setOpen} refetch={getStatusQuery.refetch} />
                     </GridItem>
                 ))
             }
         </GridBox>
     </Box>
-    <Snackbar open={openSnackbar} autoHideDuration={4000} onClose={handelAlterClose}>
-            <Alert onClose={handelAlterClose} severity="error" sx={{ width: '100%' }}>
-                {error}
+    <Snackbar open={open} autoHideDuration={4000} onClose={handelAlterClose}>
+            <Alert onClose={handelAlterClose} severity={messageType} sx={{ width: '100%' }}>
+                {message}
             </Alert>
         </Snackbar>
     <Dialog

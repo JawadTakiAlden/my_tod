@@ -4,8 +4,9 @@ import { Box } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
 import { useNavigate } from 'react-router'
-import { request } from '../api/request'
+import { baseURLImage, request } from '../api/request'
 import * as Yup from 'yup'
+import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
 
 const cloumns = [
   {
@@ -17,21 +18,23 @@ const cloumns = [
         field : 'name',
         headerName : 'Name',
         editable : true,
-        width : 150
+        minWidth : 120,
+        flex : 1
     },
     {
         field : 'image',
         headerName : 'Image',
-        width : 120,
-        alignHeader : 'center',
+        headerAlign : 'center',
+        minWidth : 120,
+        flex : 1,
         align : 'center',
         renderCell : (params) => {
-            return <a href={`http://192.168.1.19:9000${params.row.image}`} target='_blanck'><Box
+            return <a href={`${baseURLImage}${params.row.image}`} target='_blanck'><Box
                 sx={{
                     width : '50px',
                     height : '50px',
                     borderRadius : '50%',
-                    backgroundImage : `url(http://192.168.1.19:9000${params.row.image})`,
+                    backgroundImage : `url(${baseURLImage}${params.row.image})`,
                     backgroundRepeat : 'no-repeat',
                     backgroundSize : 'cover',
                     backgroundPosition : 'center'
@@ -46,14 +49,17 @@ const cloumns = [
         field : 'isExtra',
         type : 'boolean',
         editable : true,
-        headerName : 'Is Extra'
+        headerName : 'Is Extra',
+        minWidth : 120,
+        flex : 1
     },
     {
       field : 'gender',
       headerName : 'Gender',
-      width : 60,
       type : 'singelSelect',
       valueOptions : ['mail' , 'femail'],
+      minWidth : 120,
+      flex : 1,
       editable : true
     },
 ]
@@ -90,7 +96,7 @@ const validationSchema = Yup.object({
 
 
 const orginizeParentsData = (data) => {
-  return data.map(obj => ({name : obj.username , value : obj.id}))
+  return data.map(obj => ({name : obj.id +  ' - ' + obj.first_name + ' ' + obj.last_name , value : obj.id}))
 }
 
 const orginizeClassesData = (data) => {
@@ -99,43 +105,37 @@ const orginizeClassesData = (data) => {
 
 
 const Childrens = () => {
+  const childrensQuery = useQuery({
+      queryKey : ['get-childrens-from-server'],
+      queryFn : getChildrensFromServer
+  })
 
-    const navigate = useNavigate()
-    const childrensQuery = useQuery({
-        queryKey : ['get-childrens-from-server'],
-        queryFn : getChildrensFromServer
-    })
+  const parentsQuery = useQuery({
+    queryKey : ['get-parents-from-server-for-childrens'],
+    queryFn : getParentsFromServer
+  })
 
-    const parentsQuery = useQuery({
-      queryKey : ['get-parents-from-server-for-childrens'],
-      queryFn : getParentsFromServer
-    })
+  const classesQuery = useQuery({
+    queryKey : ['get-classes-from-server-for-childrens'],
+    queryFn : getClassesFromServer
+  })
 
-    const classesQuery = useQuery({
-      queryKey : ['get-classes-from-server-for-childrens'],
-      queryFn : getClassesFromServer
-    })
+  if(childrensQuery.isLoading || parentsQuery.isLoading || classesQuery.isLoading){
+      return <CubeLoader />
+    }
+  
+  if(childrensQuery.isError){
+    return <GetErrorHandler error={childrensQuery.error} refetch={childrensQuery.refetch} />
+  }
+  if(parentsQuery.isError){
+    return <GetErrorHandler error={parentsQuery.error} refetch={parentsQuery.refetch} />
+  }
+  if(classesQuery.isError){
+    return <GetErrorHandler error={classesQuery.error} refetch={classesQuery.refetch} />
+  }
 
-    if(childrensQuery.isLoading || parentsQuery.isLoading || classesQuery.isLoading){
-        return <CubeLoader />
-      }
-    
-      if(childrensQuery.isError){
-        if(childrensQuery.error.response){
-          if(childrensQuery.error.response.status === 401){
-            return navigate('/auth/signin')
-          }
-        }else if(childrensQuery.error.request){
-          return "no response receved from server"
-        }else{
-          return "unknown error with message" + childrensQuery.error.message
-        }
-      }
-
-      const parentsSelectOptions = orginizeParentsData(parentsQuery.data.data.data)
-      const classesSelectOptions = orginizeClassesData(classesQuery.data.data)
-
-      console.log(classesSelectOptions)
+  const parentsSelectOptions = orginizeParentsData(parentsQuery.data.data.data)
+  const classesSelectOptions = orginizeClassesData(classesQuery.data.data)
   return (
     <Page 
     name={'childrens'} 
@@ -205,6 +205,7 @@ const Childrens = () => {
         validationSchema={validationSchema}
         valuesShouldUpdate={['name' , 'isExtra' , 'gender']}
         updateAPI={'/children'}
+        refetch={childrensQuery.refetch}
     />
   )
 }

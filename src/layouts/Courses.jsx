@@ -8,6 +8,7 @@ import CubeLoader from '../components/CubeLoader/CubeLoader'
 import { useNavigate } from 'react-router'
 import { Box } from '@mui/material'
 import { Link } from 'react-router-dom'
+import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
 
 const courseColumns = [
   {
@@ -18,20 +19,21 @@ const courseColumns = [
   {
       field : 'name',
       headerName : 'Name',
-      width : 150,
+      flex : 1,
       editable : true
       // flex : 1
   },
   {
       field : 'description',
       headerName : 'Descritpion',
-      width : 150,
+      flex : 1,
       editable : true
   },
   {
     field : 'image',
     headerName : 'Image',
     align : 'center',
+    flex : 1,
     headerAlign : 'center',
     renderCell : (params) => {
       return <Box>
@@ -68,23 +70,18 @@ const getCourcesFromServer = () => {
 }
 
 const Courses = () => {
-  const navigate = useNavigate()
   const {isLoading , isError , error , data , refetch} = useQuery({
     queryKey : ['get-courses-from-server'],
     queryFn : getCourcesFromServer
   })
 
   if(isLoading){
-      return <CubeLoader />
-    }
+    return <CubeLoader />
+  }
     
-    if(isError){
-      if(error.response.status === 401){
-        navigate('/auth/signin')
-      }else{
-        refetch()
-      }
-    }
+  if(isError){
+    return <GetErrorHandler error={error} refetch={refetch} />
+  }
 
   return (
     <Page 
@@ -128,6 +125,7 @@ const Courses = () => {
       validationSchema={validationSchema}
       valuesShouldUpdate={['name' , 'description']}
       updateAPI={'/course'}
+      refetch={refetch}
     />
   )
 }

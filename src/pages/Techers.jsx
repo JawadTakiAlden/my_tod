@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { request } from '../api/request'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
 import { useNavigate } from 'react-router'
+import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
 
 
 const techersColumns = [
@@ -17,21 +18,21 @@ const techersColumns = [
   {
       field : 'first_name',
       headerName : 'First Name',
-      width : 150,
+      flex : 1,
       editable : true
       // flex : 1
   },
   {
       field : 'last_name',
       headerName : 'Last Name',
-      width : 150,
+      flex : 1,
       editable : true
       // flex : 1
   },
   {
     field : 'username',
     headerName : 'Username',
-    width : 150,
+    flex : 1,
     editable : true
     // flex : 1
 },
@@ -39,12 +40,12 @@ const techersColumns = [
       field : 'phone',
       headerName : 'Phone Number',
       editable : true,
-      width : 150
+      flex : 1,
   },
   {
       field : 'role',
       headerName : 'Role',
-      width : 150
+      flex : 1,
   }
 ]
 
@@ -64,7 +65,6 @@ const getTeachersFromServer = () => {
 }
 
 const Techers = () => {
-  const navigate = useNavigate()
   const {isLoading , isError , error , data , refetch} = useQuery({
     queryKey : ['get-teachers-from-server'],
     queryFn : getTeachersFromServer
@@ -75,13 +75,7 @@ const Techers = () => {
     }
     
     if(isError){
-      if(error.response.status === 401){
-        navigate('/auth/signin')
-      }else if(error.message === "Network Error"){
-        return 'network error'
-      }else{
-        refetch()
-      }
+      return <GetErrorHandler error={error} refetch={refetch} />
     }
   return (
     <Page 
@@ -137,6 +131,7 @@ const Techers = () => {
       validationSchema={validationSchema}
       valuesShouldUpdate={['first_name' , 'last_name' , 'phone']}
       updateAPI={'/accounts'}
+      refetch={refetch}
     />
   )
 }

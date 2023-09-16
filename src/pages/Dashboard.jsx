@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box, Button, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material'
 import React from 'react'
 import StatsticsCards from '../layouts/StatsticsCards'
 import ReadableCards from '../layouts/ReadableCards'
@@ -7,6 +7,8 @@ import { request } from '../api/request'
 import { useNavigate } from 'react-router'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
 import NetworkError from './Errors/NetworkError'
+import { InfoOutlined } from '@mui/icons-material'
+import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
 
 const getStatsticsFromServer = () => {
   return request({
@@ -27,13 +29,7 @@ const Dashboard = () => {
   }
 
   if(isError){
-    if(error.response.status === 401){
-      navigate('/auth/signin')
-    }else if(error.message === "Network Error"){
-      return <NetworkError />
-    }else{
-      refetch()
-    }
+    return <GetErrorHandler error={error} refetch={refetch} />
   }
   return (
     <Box

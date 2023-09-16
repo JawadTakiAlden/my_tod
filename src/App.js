@@ -38,14 +38,15 @@ const App = () => {
           <Box
             sx={{
               display: "flex",
-              gap: "5px",
+              padding : '0 10px'
             }}
           >
             {pathname.includes("auth") ? undefined : <DashboardSidebar />}
 
             <Box
               sx={{
-                flexBasis: "100%",
+                // flex : 1
+                width : '100%'
               }}
             >
               <Header />

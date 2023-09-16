@@ -8,11 +8,9 @@ import { request } from '../api/request'
 import { useMutation } from '@tanstack/react-query'
 
 
-const SaveAction = ({ params , rowId , setRowId , name , valuesShouldUpdate , updateAPI}) => {
+const SaveAction = ({ params , rowId , setRowId , name , valuesShouldUpdate , updateAPI , setMessage , setMessageType , refetch , setOpen}) => {
     const [loading , setLoading] = useState(false)
     const [success , setSuccess] = useState(false)
-    const [open , setOpen] = useState(false)
-    const [error , setError] = useState("")
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
     const updateInformationInServer = (values) => {
@@ -26,52 +24,59 @@ const SaveAction = ({ params , rowId , setRowId , name , valuesShouldUpdate , up
     const updateInformationMutation = useMutation({
         mutationKey : [`update-${name.slice(-1,1)}-in-server`],
         mutationFn : updateInformationInServer,
-        onSuccess : (data) => {
-            console.log(data)
+        onSuccess : () => {
             setSuccess(true)
             setRowId(null)
             setLoading(false)
+            refetch()
+            setMessage('one row updated successfully')
+            setMessageType('info')
+            setOpen(true)
         },
         onError : (error) => {
-            if(!error.response || error.message === 'Network Error'){
-                setError("obbs , you have internet connection problems")
-                setOpen(true)
-                return
-            }
-            switch(error.response.status){
-                case 404 : {
-                    setError("obbs , you're out of space , the destenation not found in our system")
-                    setOpen(true)
-                    setLoading(false)
-                    break ;
-                }
+            if (error.response){
+              switch(error.response.status){
                 case 401 : {
-                    setError(`you're not authorize to create new ${name} in our system`)
-                    setOpen(true)
-                    setLoading(false)
-                    break ;
-                }
-
-                case 500 : {
-                    setError("obbs , there are some problems in our server , we will fix it soon , come backe later")
-                    setOpen(true)
-                    setLoading(false)
-                    break
+                    setMessage('you are not authorize to make this request')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
                 case 422 : {
-                    setError("obbs , may you are making some mistake in your entered data")
-                    setOpen(true)
-                    setLoading(false)
-                    break
+                    setMessage('problems with data you are entered')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 500 : {
+                    setMessage('we have a problem in our server , come later')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 404 : {
+                    setMessage("we out of space , we can't find your destenation")
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
                 default : {
-                    setError(`obbs ,unknown error happend with status code ${error.status}`)
-                    setOpen(true)
-                    setLoading(false)
-                    break
+                    setMessage("unkown error accoure : request falid with status code" + error.response.status)
+                  setMessageType('error')
+                  setOpen(true)
+                  break
                 }
-            }  
-        }
+              }
+            }else if(error.request){
+                setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+              setMessageType('error')
+              setOpen(true)
+            }else {
+                setMessage('unknow error : ' + error.message)
+              setMessageType('error')
+              setOpen(true)
+            }
+          }
     })
 
     const saveUpdateHandler = () => {

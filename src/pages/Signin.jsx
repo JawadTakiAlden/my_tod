@@ -26,7 +26,8 @@ const Signin = () => {
     const colors = tokens(theme.palette.mode)
     const isExtraSmall = useMediaQuery('(max-width:599px)')
     const [open , setOpen] = useState(false)
-    const [error , setError] = useState("")
+    const [message , setMessage] = useState("")
+    const [messageType , setMessageType] = useState("success")
     const [ , dispatch] = useJawadAuthController()
 
     const handleClose = (event, reason) => {
@@ -48,54 +49,53 @@ const Signin = () => {
         navigate('/dashboard')
       },
       onError : (error) => {
-        if(!error.response && error.message === 'Network Error'){
-          setError("obbs , you have internet connection problems")
+        if (error.response){
+          switch(error.response.status){
+            case 401 : {
+                setMessage('you are not authorize to get in our system')
+              setMessageType('error')
+              setOpen(true)
+              break
+            }
+            case 422 : {
+                setMessage('email or password is wrong')
+              setMessageType('error')
+              setOpen(true)
+              break
+            }
+            case 500 : {
+                setMessage('we have a problem in our server , come later')
+              setMessageType('error')
+              setOpen(true)
+              break
+            }
+            case 404 : {
+                setMessage("we out of space , we can't find your destenation")
+              setMessageType('error')
+              setOpen(true)
+              break
+            }
+            default : {
+                setMessage("unkown error accoure : request falid with status code" + error.response.status)
+              setMessageType('error')
+              setOpen(true)
+              break
+            }
+          }
+        }else if(error.request){
+            setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+          setMessageType('error')
           setOpen(true)
-          return
+        }else {
+            setMessage('unknow error : ' + error.message)
+          setMessageType('error')
+          setOpen(true)
         }
-            switch(error.response.status){
-                case 404 : {
-                    setError("obbs , you're out of space , the destenation not found in our system")
-                    setOpen(true)
-                    break ;
-                }
-                case 401 : {
-                    setError("you're not authorize to get in our system")
-                    setOpen(true)
-                    break ;
-                }
-
-                case 500 : {
-                    setError("obbs , there are some problems in our server , we will fix it soon , come backe later")
-                    setOpen(true)
-                    break
-                }
-                case 422 : {
-                    setError("obbs , may you are making mistake with your password or email")
-                    setOpen(true)
-                    break
-                }
-                default : {
-                    setError(`obbs ,unknown error happend with status code ${error.status}`)
-                    setOpen(true)
-                    break
-                }
-            }        
-        }
+      }
     })
 
     const loginFormHandler = (values) => {
       mutate(values)
-      // login.mutate(values)
-      // request({
-      //   url : '/login',
-      //   method : 'POST',
-      //   data : values
-      // }).then(res => {
-      //   console.log(res)
-      // }).catch(err => {
-      //   console.log(err)
-      // })
     }
 
     if(isLoading){
@@ -237,8 +237,8 @@ const Signin = () => {
     </GridBox>
     </Box>
     <Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
-            <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-                {error}
+            <Alert onClose={handleClose} severity={messageType} sx={{ width: '100%' }}>
+                {message}
             </Alert>
         </Snackbar>
     </>
