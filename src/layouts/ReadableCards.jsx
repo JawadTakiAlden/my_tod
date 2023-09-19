@@ -1,14 +1,30 @@
-import { Box, Button, List, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material'
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemIcon, ListItemText, TextField, Typography, useTheme } from '@mui/material'
 import React from 'react'
 import GridBox from '../components/GridBox'
 import GridItem from '../components/GridItem'
 import { tokens } from '../assets/theme'
 import { NoteOutlined } from '@mui/icons-material'
+import { Formik } from 'formik'
+import * as Yup from 'yup'
 
 const ReadableCards = () => {
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
+    const [open, setOpen] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const sendNotificationHandler = (values) => {
+        console.log(values)
+    }
   return (
+    <>
     <Box
         sx={{
             margin : '30px 0',
@@ -156,15 +172,73 @@ const ReadableCards = () => {
                             }}
                             variant='h5'
                         >
-                            if you are'nt visit settings page yet , what you wait , visit it right now there are a lot of cute things watting for you
+                            do you want to make a new notification , create new one right now!
                         </Typography>
-                        <Button color='secondary'>move on</Button>
+                        <Button color='secondary' onClick={handleClickOpen}>create notification</Button>
                     </Box>
                 </Box>
             </GridItem>
         </GridBox>
     </Box>
+    <Dialog open={open} onClose={handleClose} fullWidth>
+        <DialogTitle>Send Notification</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            publish new notification for user 
+          </DialogContentText>
+        <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={sendNotificationHandler}
+        >
+            {
+                ({handleBlur , handleChange , handleSubmit , values , errors , touched}) => (
+                    <form onSubmit={handleSubmit}>
+                        <TextField
+                            label="Message"
+                            multiline
+                            rows={4}
+                            value={values.message}
+                            name='message'
+                            fullWidth
+                            variant="outlined"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={!!touched.message && !!errors.message}
+                            helperText={touched.message && errors.message}
+                        />
+                        <Box
+                            sx={{
+                                display : 'flex',
+                                alignItems : 'center',
+                                justifyContent: 'flex-end',
+                                marginTop : '10px'
+                            }}
+                        >
+                            <Button type='submit' color='success'>
+                                Send Notification
+                            </Button>
+                        </Box>
+                    </form>
+                )
+            }
+        </Formik>
+          
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color='error'>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   )
 }
+
+const initialValues = {
+    message : ''
+}
+
+const validationSchema = Yup.object({
+    message : Yup.string().required('message is required')
+})
 
 export default ReadableCards

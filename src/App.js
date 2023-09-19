@@ -66,8 +66,8 @@ const App = () => {
                 <Route path={'/stuffs/:stuffID'} element={<StuffInformation />} />
                 <Route path={'/age-sections'} element={<AgeSection />} />
                 <Route path={'/classes'} element={<Classes />} />
-                <Route path={'/classes/:classID'} element={<ClassInformation />} />
-                <Route path={'/courses'} element={<Courses />} />
+                {/* <Route path={'/classes/:classID'} element={<ClassInformation />} />
+                <Route path={'/courses'} element={<Courses />} /> */}
                 <Route path={'/courses/:courseID'} element={<CourseInforamtion />} />
                 <Route path={'/images'} element={<PublicImages />} />
               </Routes>

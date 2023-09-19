@@ -304,7 +304,7 @@ const Event = () => {
             key={item.src}
             sx={{
               position : 'relative',
-              borderRadius : '6px'
+              borderRadius : '0px 6px 6px 6px'
               
             }}
             
@@ -334,7 +334,7 @@ const Event = () => {
               alt={item.src}
               loading="lazy"
               style={{
-                borderRadius : '6px'
+                borderRadius : '0px 6px 6px 6px'
               }}
             />
           </ImageListItem>

@@ -188,8 +188,34 @@ const PublicImages = () => {
 
     const addImageFornHanderler = (values) => {
         let data = {
-          image : values.imageFile
+          images : values.imageFile
         }
+        let i = 0
+    if(values.imageFile.length > 5){
+      while( i < values.imageFile.length ){
+        if(i+5 <= values.imageFile.length){
+          let currentImages = [] ;
+          for(let j = i ; j < i+5 ; j ++){
+            currentImages[j] = values.imageFile[j]
+          }
+          const currentData = {
+            images : currentImages
+          }
+          addImageMutation.mutate(currentData)
+          i+=5
+        }else{
+          let currentImages = [] ;
+          for(let j = i ; j < values.imageFile.length ; j ++){
+            currentImages[j] = values.imageFile[j]
+          }
+          const currentData = {
+            images : currentImages
+          }
+          addImageMutation.mutate(currentData)
+          i+= values.imageFile.length - i
+        }
+      }
+    }
         addImageMutation.mutate(data)
         setOpen(false)
 
@@ -375,7 +401,7 @@ export default PublicImages
 
 const initialValues = {
     image : '',
-    imageFile : {}
+    imageFile : ''
 }
 
 const validationSchema = Yup.object({

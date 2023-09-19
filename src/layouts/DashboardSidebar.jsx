@@ -89,7 +89,7 @@ const DashboardSidebar = () => {
         <MyItem title={'Parents'} to={'/parents'} icon={<PeopleOutlined />} />
         <MyItem title={'Stuffs'} to={'/stuffs'} icon={<LeaderboardOutlined />} />
         <MyItem title={'Classes'} to={'/classes'} icon={<ClassOutlined />} />
-        <MyItem title={'Courses'} to={'/courses'} icon={<GolfCourseOutlined />} />
+        {/* <MyItem title={'Courses'} to={'/courses'} icon={<GolfCourseOutlined />} /> */}
         <MyItem title={'Childrens'} to={'/childrens'} icon={<SchoolOutlined />} />
         <MyItem title={'Age-Sections'} to={'/age-sections'} icon={<EscalatorWarning />} />
         <MyItem title={'FAQs'} to={'/faqs'} icon={<QuestionMarkOutlined />} />

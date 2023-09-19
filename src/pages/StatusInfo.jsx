@@ -10,6 +10,7 @@ import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { request } from '../api/request'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import CubeLoader from '../components/CubeLoader/CubeLoader'
 
 const addNewSubStatusInServer = (values) => {
     return request({
@@ -61,10 +62,9 @@ const StatusInfo = () => {
         queryFn : getStatusFromServer
     })
     if(c.isLoading){
-        return "loading ..."
+        return <CubeLoader />
     }
     const substatus = c.data.data.status.substatus
-    console.log(substatus)
 
         return (
             <>

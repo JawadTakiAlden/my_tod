@@ -12,6 +12,7 @@ import { request } from '../api/request'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
 import { VisuallyHiddenInput } from '../components/VisuallyHiddenInput'
 import { styled } from '@mui/material/styles';
+import CopyField from '../components/CopyField'
 
 const StyledGridOverlay = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -93,6 +94,11 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
     const [open , setOpen] = useState(false)
     const [message , setMessage] = useState("")
     const [messageType , setMessageType] = useState("")
+    const [userInfoOpen , setuserInfoOpen] = useState(false)
+    const [userCreadintials , setUserCreadintials] = useState({
+      username : '',
+      password : ''
+    })
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
     const isNoneMobile = useMediaQuery('(min-width : 600px')
@@ -100,6 +106,13 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
 
     const [imagePreview, setImagePreview] = useState(null);
 
+    const handelUserInfoOpenClick = () => {
+      setuserInfoOpen(true);
+  };
+
+  const handelUserInfoOpenClose = () => {
+    setuserInfoOpen(false);
+  };
 
     const handleSelectImage = (event) => {
         const file = event.target.files[0];
@@ -131,11 +144,18 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
     const addToServerMutation = useMutation({
         mutationKey : [`add-${name.slice(-1,1)}-to-server`],
         mutationFn : addToServer,
-        onSuccess : () => {
+        onSuccess : (data) => {
             refetch()
             setMessage('one row added successfully')
             setMessageType('success')
             setOpen(true)
+            if(name === 'parents' || name === 'stuff'){
+              setUserCreadintials({
+                username : data.data.user.username,
+                password : data.data.password
+              })
+              handelUserInfoOpenClick()
+            }
             setFormOpen(false)
         },
         onError : (error) => {
@@ -565,8 +585,9 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
     </Box>
         </Box>
         <Dialog
-            maxWidth={'xs'}
+            maxWidth={'md'}
             open={deleteRowDialogOpen}
+            
         >
             <DialogTitle
                 sx={{
@@ -594,6 +615,39 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
             color='success'
           >
             Confirm
+          </Button>
+        </DialogActions>
+        </Dialog>
+        <Dialog
+            maxWidth={'xs'}
+            open={userInfoOpen}
+            sx={{
+              overflowX : 'hidden'
+            }}
+        >
+            <DialogTitle
+                sx={{
+                    color : colors.yellowAccent[500],
+                    textTransform : 'capitalize'
+                }}
+            >User Information Credintilas</DialogTitle>
+        <DialogContent
+          sx={{
+            overflowX:'hidden'
+          }}
+        >
+          <DialogContentText
+            sx={{
+                textTransform : 'capitalize'
+            }}
+          >
+            copy login creadintails and keep it secret
+          </DialogContentText>
+          <CopyField password={`username : ${userCreadintials.username} , password : ${userCreadintials.password}`} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handelUserInfoOpenClose} color="error">
+            close
           </Button>
         </DialogActions>
         </Dialog>

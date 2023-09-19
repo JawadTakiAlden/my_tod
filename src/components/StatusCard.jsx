@@ -33,7 +33,6 @@ const StatusCard = ({type , subStatus}) => {
 
     const deleteEventDialogClose = () => {
         setDeleteDialogOpen(false)
-        console.log('Event Card Page : delete event rejected by click on cancle button')
     }
 
 
@@ -69,7 +68,6 @@ const StatusCard = ({type , subStatus}) => {
         if(values.image){
             data['image'] = values.imageFile
         }
-        // console.log(data)
         updateSubStatusMutation.mutate(data)
     }
     const updateEventDialogOpen = () => {
