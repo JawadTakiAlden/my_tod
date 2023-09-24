@@ -10,10 +10,16 @@ const CopyField = ({password}) => {
     const colors = tokens(myThheme.palette.mode)
     const [passwordCopyed , setPassowrdCopyed] = useState(false)
     const passwordRef = useRef(null)
-    // function to copy text to collprate ?
     const copyPassword = async() => {
-        await navigator.clipboard.writeText(passwordRef.current.innerText).then(() => setPassowrdCopyed(true)).catch((e) => console.log(e));
-    }
+
+        try {
+          await navigator.clipboard.writeText(passwordRef.current.innerText)
+          setPassowrdCopyed(true)
+        } catch (e) {
+          console.log(e)
+        }
+      
+      }
   return (
     <>
         <Box
