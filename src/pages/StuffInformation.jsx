@@ -36,7 +36,6 @@ const StuffInformation = () => {
     }
 
     const stuffInformation = getStuffQuery.data.data.account
-    console.log(stuffInformation)
   return (
     <>
         <Box>
@@ -78,14 +77,14 @@ const StuffInformation = () => {
                     </ListItemText>
                 </ListItem>
                 {
-                    stuffInformation.role === 'teacher'
+                    stuffInformation.role === 'teacher' && stuffInformation.classRoom
                     && (
                         <ListItem>
                             <ListItemIcon>
                                 <ClassOutlined />
                             </ListItemIcon>
                             <ListItemText>
-                                {stuffInformation.classRoom.name}
+                                {stuffInformation?.classRoom?.name}
                             </ListItemText>
                         </ListItem>
                     )
@@ -100,9 +99,10 @@ const StuffInformation = () => {
                         sx={{
                             color : colors.yellowAccent[500],
                             fontSize : '25px',
-                            textTransform : 'capitalize'
+                            textTransform : 'capitalize',
+                            textAlign : 'center'
                         }}
-                    > This Teacher Havent Teacher Yet </Typography>
+                    > This Teacher Havent Class Yet </Typography>
                 )
                 : (
                     <ImageList variant="masonry" cols={3} gap={8}>

@@ -19,6 +19,7 @@ const techersColumns = [
       field : 'first_name',
       headerName : 'First Name',
       flex : 1,
+      minWidth : 150,
       editable : true
       // flex : 1
   },
@@ -26,6 +27,7 @@ const techersColumns = [
       field : 'last_name',
       headerName : 'Last Name',
       flex : 1,
+      minWidth : 150,
       editable : true
       // flex : 1
   },
@@ -33,6 +35,7 @@ const techersColumns = [
     field : 'username',
     headerName : 'Username',
     flex : 1,
+    minWidth : 150,
     editable : true
     // flex : 1
 },
@@ -41,11 +44,13 @@ const techersColumns = [
       headerName : 'Phone Number',
       editable : true,
       flex : 1,
+      minWidth : 150,
   },
   {
       field : 'role',
       headerName : 'Role',
       flex : 1,
+      minWidth : 150,
   }
 ]
 

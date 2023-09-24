@@ -284,7 +284,7 @@ const PublicImages = () => {
             </IconButton>
             <img
               src={`${baseURLImage}${item.image_url}?w=248&fit=crop&auto=format`}
-              srcSet={`http://127.0.0.1:8000${item.image_url}?w=248&fit=crop&auto=format&dpr=2 2x`}
+              srcSet={`${baseURLImage}${item.image_url}?w=248&fit=crop&auto=format&dpr=2 2x`}
               alt={item.title}
               loading="lazy"
               style={{

@@ -19,7 +19,7 @@ const signinHandler = (values) => {
     method : 'post',
     data : {
       ...values,
-      device_token : 'kdfnaskjdnak,ndwilahdhnskandawihdnaljdnhakjwdnkjabshab'
+      device_token : 'kdfnaskjdnakndwilahdhnskandawihdnaljdnhakjwdnkjabshab'
     },
   }).then(res => res)
 }

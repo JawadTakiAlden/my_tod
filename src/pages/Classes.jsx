@@ -40,7 +40,6 @@ const getAgeSectionFromServer = () => {
 }
 
 const orginizeData = (values) => {
-  console.log(values)
   const newValues = values.map(valuesObject => (
     {
       name : valuesObject.first_name + ' ' +valuesObject.last_name,
@@ -109,15 +108,16 @@ const Classes = () => {
         field : 'name',
         headerName : 'Class Name',
         flex : 1,
+        minWidth : 150,
         editable : true
         // flex : 1
     },
     {
         field : 'age_section',
         headerName : 'Age Section',
+        minWidth : 150,
         flex : 1,
         valueGetter : (params) => {
-          console.log(params.row)
           return params.row.age_section
         },
         valueFormatter : (params) => {
@@ -128,6 +128,7 @@ const Classes = () => {
         field : 'teacher_id',
         headerName : 'Teacher ID',
         flex : 1,
+        minWidth : 150,
         type : 'singleSelect',
         valueOptions : () => {
           return teachers.map(obj => obj.id)
