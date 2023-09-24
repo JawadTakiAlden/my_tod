@@ -1,14 +1,17 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, TextField, Typography, useTheme } from '@mui/material'
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormHelperText, IconButton, TextField, Typography, useTheme } from '@mui/material'
 import React , { useState } from 'react'
 import Image from '../assets/images/20.png'
 
 import { tokens } from '../assets/theme'
-import { DeleteOutlined, LinkOutlined, UpdateOutlined } from '@mui/icons-material'
+import { CloudUpload, DeleteOutlined, LinkOutlined, UpdateOutlined } from '@mui/icons-material'
 import { Link } from 'react-router-dom'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { useMutation } from '@tanstack/react-query'
 import { baseURLImage, request } from '../api/request'
+import CubeLoader from './CubeLoader/CubeLoader'
+import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
+import { VisuallyHiddenInput } from './VisuallyHiddenInput'
 
 const delteSubStatusFromServer = (id) => {
     return request({
@@ -17,7 +20,7 @@ const delteSubStatusFromServer = (id) => {
     })
 }
 
-const StatusCard = ({type , subStatus}) => {
+const StatusCard = ({type , subStatus , setMessageType , setOpen , setMessage , refetch}) => {
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
     const [deleteDialogOpen , setDeleteDialogOpen] = useState(false)
@@ -25,6 +28,12 @@ const StatusCard = ({type , subStatus}) => {
     const randomNumberBetween0Adn7 = Math.floor(Math.random() * 7)
     const randomNumberBetween100And700 = (randomNumberBetween0Adn7 !== 0 ? randomNumberBetween0Adn7 : 1) * 100
     const randomColor = colors.mix[randomNumberBetween100And700]
+    const [imagePreview, setImagePreview] = useState(null);
+    const handleSelectImage = (event) => {
+        const file = event.target.files[0];
+        
+        setImagePreview(URL.createObjectURL(file))
+      }
 
 
     const deleteEventDialogOpen = () => {
@@ -38,7 +47,57 @@ const StatusCard = ({type , subStatus}) => {
 
     const deletesubStatus = useMutation({
         mutationKey : [`delete-substatus-${subStatus.id}-from-server`],
-        mutationFn : () => delteSubStatusFromServer(subStatus.id)
+        mutationFn : () => delteSubStatusFromServer(subStatus.id),
+        onSuccess : () => {
+            refetch()
+            setMessage('one sub status deleted successfully')
+            setMessageType('success')
+            setOpen(true)
+        },
+        onError : (error) => {
+            if (error.response){
+              switch(error.response.status){
+                case 401 : {
+                    setMessage('you are not authorize to get in our system')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 422 : {
+                    setMessage('wrong entered data')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 500 : {
+                    setMessage('we have a problem in our server , come later')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 404 : {
+                    setMessage("we out of space , we can't find your destenation")
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                default : {
+                    setMessage("unkown error accoure : request falid with status code" + error.response.status)
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+              }
+            }else if(error.request){
+                setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+              setMessageType('error')
+              setOpen(true)
+            }else {
+                setMessage('unknow error : ' + error.message)
+              setMessageType('error')
+              setOpen(true)
+            }
+          }
     })
 
     const deleteDialogConfirm = () => {
@@ -49,16 +108,71 @@ const StatusCard = ({type , subStatus}) => {
     const updateSubStatusInServer = (values) => {
         return request({
             url : `/substatus/${subStatus.id}`,
-            method : 'put',
+            method : 'post',
+            headers : {
+                'Content-Type': 'multipart/form-data',
+            },
             data : {
-                ...values
+                ...values,
             }
         })
     }
 
     const updateSubStatusMutation = useMutation({
         mutationKey : [`update-substatus-${subStatus.id}-in-server`],
-        mutationFn : updateSubStatusInServer
+        mutationFn : updateSubStatusInServer,
+        onSuccess : () => {
+            refetch()
+            setMessage('updated successfully for system')
+            setMessageType('info')
+            setOpen(true)
+            setUpdateDialogOpen(false)
+            setImagePreview(null)
+        },
+        onError : (error) => {
+            if (error.response){
+              switch(error.response.status){
+                case 401 : {
+                    setMessage('you are not authorize to get in our system')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 422 : {
+                    setMessage('wrong entered data')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 500 : {
+                    setMessage('we have a problem in our server , come later')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 404 : {
+                    setMessage("we out of space , we can't find your destenation")
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                default : {
+                    setMessage("unkown error accoure : request falid with status code" + error.response.status)
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+              }
+            }else if(error.request){
+                setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+              setMessageType('error')
+              setOpen(true)
+            }else {
+                setMessage('unknow error : ' + error.message)
+              setMessageType('error')
+              setOpen(true)
+            }
+          }
     })
     const updateEventHandler = (values) => {
         let data = {
@@ -75,6 +189,7 @@ const StatusCard = ({type , subStatus}) => {
     }
     const updateEventDialogClose = () => {
         setUpdateDialogOpen(false)
+        setImagePreview(null)
         console.log('update event action canceld by click on cancel button')
     }
     const initialValues = {
@@ -82,6 +197,10 @@ const StatusCard = ({type , subStatus}) => {
         image : '',
         imageFile : ''
       }
+
+      if(deletesubStatus.isLoading || updateSubStatusMutation.isLoading){
+        return <CubeLoader />
+    }
 
   return (
     <>
@@ -339,22 +458,76 @@ const StatusCard = ({type , subStatus}) => {
                                     helperText={touched.name && errors.name}
                                     sx={{ gridColumn: "span 4" }}
                                 />
-                                <TextField
+                                <Box
+                  sx={{ gridColumn: "span 4" }}
+                        >
+                            <Button
+                                    component="label"
+                                    variant="contained"
+                                    startIcon={<CloudUpload />}
+                                    href="#file-upload"
                                     fullWidth
-                                    variant="filled"
-                                    type="file"
-                                    label="Image"
-                                    onBlur={handleBlur}
-                                    onChange={(e) => {
+                                    color='secondary'
+                                    sx={{
+                                        marginBottom : '10px'
+                                    }}
+                                >
+                                    Upload a file
+                                    <VisuallyHiddenInput onChange={(e) => {
                                         setFieldValue('imageFile' , e.currentTarget.files[0])
                                         handleChange(e)
-                                    }}
-                                    value={values.image}
-                                    name="image"
-                                    error={!!touched.image && !!errors.image}
-                                    helperText={touched.image && errors.image}
-                                    sx={{ gridColumn: "span 4" }}
-                                />
+                                        handleSelectImage(e)
+                                    }} onBlur={handleBlur} multiple type="file" name="image" value={values.image} />
+                                    
+                                </Button>
+                                {touched.image && errors.image && (
+                                    <FormHelperText error>
+                                    {errors.image}
+                                    </FormHelperText>
+                                )}
+                                {
+                                    imagePreview 
+                                    ? (
+                                        <Box
+                                            sx={{
+                                                gridColumn: "span 4",
+                                                textAlign : 'center',
+                                                maxHeight : '200px',
+                                                overflowY: 'auto'
+                                            }}
+                                        >
+                                        <img 
+                                            src={imagePreview}
+                                            style={{
+                                                maxWidth : '200px',
+                                                borderRadius :'10px',
+                                                border : '1px dotted #888'
+                                            }}
+                                        />
+                                        </Box>
+                                    )
+                                    : (
+                                      <Box
+                                            sx={{
+                                                gridColumn: "span 4",
+                                                textAlign : 'center',
+                                                maxHeight : '200px',
+                                                overflowY: 'auto'
+                                            }}
+                                        >
+                                        <img 
+                                            src={`${baseURLImage}${subStatus.image}`}
+                                            style={{
+                                                maxWidth : '200px',
+                                                borderRadius :'10px',
+                                                border : '1px dotted #888'
+                                            }}
+                                        />
+                                        </Box>
+                                    )
+                                }
+                        
+                                </Box>
               </Box>
               <Box display="flex" justifyContent="end" mt="20px">
                 <Button type="submit" color="success" variant="contained">

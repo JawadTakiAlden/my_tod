@@ -50,6 +50,9 @@ const Header = () => {
       
 
       <Box>
+        {
+          controller.isAuth
+          ? (
         <IconButton
           onClick={() => {
             setOpenSidebar(dispatch , !controller.openSidebar)
@@ -57,6 +60,10 @@ const Header = () => {
         >
           <MenuOpen />
         </IconButton>
+          )
+          : undefined
+        }
+        
         <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === "dark" ? (
             <DarkModeOutlined />
@@ -64,10 +71,16 @@ const Header = () => {
             <LightModeOutlined color="secondary" />
           )}
         </IconButton>
-        <Button color="error" onClick={logoutUser}>
-          logout
-          <LogoutOutlined />
-        </Button>
+        {
+            controller.isAuth
+            ? (
+              <Button color="error" onClick={logoutUser}>
+                logout
+                <LogoutOutlined />
+              </Button>
+            )
+            : undefined
+          }
       </Box>
     </Box>
   );

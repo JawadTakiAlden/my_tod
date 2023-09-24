@@ -17,7 +17,10 @@ const signinHandler = (values) => {
   return request({
     url : '/login',
     method : 'post',
-    data : values,
+    data : {
+      ...values,
+      device_token : 'kdfnaskjdnak,ndwilahdhnskandawihdnaljdnhakjwdnkjabshab'
+    },
   }).then(res => res)
 }
 

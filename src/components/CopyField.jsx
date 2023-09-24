@@ -12,12 +12,8 @@ const CopyField = ({password}) => {
     const passwordRef = useRef(null)
     // function to copy text to collprate ?
     const copyPassword = async() => {
-
-        await navigator.clipboard.writeText(passwordRef.current.innerText);
-
-        setPassowrdCopyed(true)
-      
-      }
+        await navigator.clipboard.writeText(passwordRef.current.innerText).then(() => setPassowrdCopyed(true)).catch((e) => console.log(e));
+    }
   return (
     <>
         <Box

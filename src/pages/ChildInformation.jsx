@@ -1,5 +1,5 @@
 import { CloudUpload, PermIdentityOutlined} from '@mui/icons-material'
-import { Box, Button, ImageList, ImageListItem, List, ListItem, ListItemIcon, ListItemText, TextField, Typography, useTheme } from '@mui/material'
+import { Alert, Box, Button, ImageList, ImageListItem, List, ListItem, ListItemIcon, ListItemText, Snackbar, TextField, Typography, useTheme } from '@mui/material'
 import React, { useState } from 'react'
 import { tokens } from '../assets/theme'
 import { useLocation, useParams } from 'react-router'
@@ -8,6 +8,7 @@ import * as Yup from 'yup'
 import { baseURLImage, request } from '../api/request'
 import { useMutation } from '@tanstack/react-query'
 import { VisuallyHiddenInput } from '../components/VisuallyHiddenInput'
+import CubeLoader from '../components/CubeLoader/CubeLoader'
 
 
 const ChildInformation = () => {
@@ -15,8 +16,19 @@ const ChildInformation = () => {
     const [updateFormOpen , setUpdateFormOpen] = useState(false)
     const colors = tokens(theme.palette.mode)
     const {state : {data}} = useLocation()
-
+    const [open , setOpen] = useState(false)
+    const [message , setMessage] = useState("")
+    const [messageType , setMessageType] = useState("success")
     const [imagePreview, setImagePreview] = useState(null);
+
+    const handleClose = (event, reason) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+  
+      setOpen(false);
+    };
+
 
 
     const handleSelectImage = (event) => {
@@ -47,7 +59,57 @@ const ChildInformation = () => {
     }
     const updateImageMution = useMutation({
         mutationKey : [`update-child-${data.id}-image-in server`],
-        mutationFn : updateImage
+        mutationFn : updateImage,
+        onSuccess : () => {
+            setMessage('added successfully for system')
+            setMessageType('success')
+            setOpen(true)
+            setUpdateFormOpen(false)
+        },
+        onError : (error) => {
+            if (error.response){
+              switch(error.response.status){
+                case 401 : {
+                    setMessage('you are not authorize to get in our system')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 422 : {
+                    setMessage('wrong entered data')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 500 : {
+                    setMessage('we have a problem in our server , come later')
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                case 404 : {
+                    setMessage("we out of space , we can't find your destenation")
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+                default : {
+                    setMessage("unkown error accoure : request falid with status code" + error.response.status)
+                  setMessageType('error')
+                  setOpen(true)
+                  break
+                }
+              }
+            }else if(error.request){
+                setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+              setMessageType('error')
+              setOpen(true)
+            }else {
+                setMessage('unknow error : ' + error.message)
+              setMessageType('error')
+              setOpen(true)
+            }
+          }
     })
 
     const handleFormSubmit = (values) => {
@@ -57,7 +119,12 @@ const ChildInformation = () => {
         updateImageMution.mutate(data)
     }
 
+    if(updateImageMution.isLoading){
+        return <CubeLoader />
+    }
+
   return (
+    <>
     <Box>
         <Button
             onClick={()=> setUpdateFormOpen(true)}
@@ -109,7 +176,8 @@ const ChildInformation = () => {
                                 color='secondary'
                                 sx={{
                                     gridColumn: "span 4",
-                                    padding : '10px 20px'
+                                    padding : '10px 20px',
+                                    marginTop : '10px'
                                 }}
                             >
                                 Upload a file
@@ -207,6 +275,12 @@ const ChildInformation = () => {
                 </ListItem>
             </List>
         </Box>
+        <Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
+            <Alert onClose={handleClose} severity={messageType} sx={{ width: '100%' }}>
+                {message}
+            </Alert>
+        </Snackbar>
+        </>
   )
 }
 

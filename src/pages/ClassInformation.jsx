@@ -8,8 +8,8 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { tokens } from "../assets/theme";
 import GridBox from "../components/GridBox";
 import GridItem from "../components/GridItem";
@@ -17,7 +17,7 @@ import ChildCard from "../layouts/ChildCard";
 import { request } from "../api/request";
 import { useQuery } from "@tanstack/react-query";
 import CubeLoader from "../components/CubeLoader/CubeLoader";
-import NetworkError from "./Errors/NetworkError";
+import { GetErrorHandler } from "../helper/GetErrorHandlerHelper";
 
 
 
@@ -26,8 +26,6 @@ const ClassInformation = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { classID } = useParams();
-  const navigate = useNavigate();
-
   const getChildrenClasses = () => {
     return request({ url: `/classroom/${classID}` });
   };
@@ -44,19 +42,12 @@ const ClassInformation = () => {
   }
 
   if (isError) {
-    if (error.response.status === 401) {
-      navigate("/auth/signin");
-    } else if (error.message === "Network Error") {
-      return <NetworkError />;
-    } else {
-      refetch();
-    }
+    return <GetErrorHandler error={error} refetch={refetch} />
   }
   const classRoom = data.data.class;
   const teacher = data.data.class.teacher;
   const ageSection = classRoom.age_section;
   const children = data.data.class.children;
-  console.log()
   return (
     <>
     <Box>

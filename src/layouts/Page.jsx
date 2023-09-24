@@ -1,10 +1,10 @@
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, MenuItem, Select, Snackbar, TextField, useMediaQuery, useTheme } from '@mui/material'
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormHelperText, IconButton, MenuItem, Select, Snackbar, TextField, Typography, useMediaQuery, useTheme } from '@mui/material'
 import React, {  useState } from 'react'
 import { tokens } from '../assets/theme'
 import { Formik } from 'formik'
 import { CloudUpload, DeleteOutlined, NavigateNextOutlined } from '@mui/icons-material'
 import { Link, useLocation } from 'react-router-dom'
-import { DataGrid, GridNoRowsOverlay, GridToolbar } from '@mui/x-data-grid'
+import { DataGrid, GridToolbar } from '@mui/x-data-grid'
 import SaveAction from '../components/SaveAction'
 import { useMemo } from 'react'
 import { useMutation } from '@tanstack/react-query'
@@ -149,7 +149,7 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
             setMessage('one row added successfully')
             setMessageType('success')
             setOpen(true)
-            if(name === 'parents' || name === 'stuff'){
+            if(name === 'parents' || name === 'staff'){
               setUserCreadintials({
                 username : data.data.user.username,
                 password : data.data.password
@@ -407,15 +407,28 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                                         formInputs.map((input , i) => {
                                             // initial[input.name] = input.initialValues
                                             if(input.type === 'select'){
-                                                return <Select
+                                                return <Box
+                                                  sx={{
+                                                    gridColumn: "span 2",
+                                                    width : '100%'
+                                                  }}
+                                                  key={i}
+                                                >
+                                                <Typography>{input.lable}</Typography>
+                                                <Select
                                                     value={values[input.name]}
                                                     onChange={handleChange}
-                                                    autoWidth
-                                                    label={input.lable}
+                                                    fullWidth
+                                                    label={<Typography>{input.label}</Typography>}
+                                                    id={`select-${input.label}-input`}
+                                                    labelId={`select-${input.label}-input`}
                                                     name={input.name}
-                                                    variant='filled'
+                                                    variant='outlined'
                                                     sx={{
-                                                        gridColumn: "span 2",
+                                                        
+                                                        "& .MuiOutlinedInput-notchedOutline" : {
+                                                          color : '#fff',
+                                                        }
                                                     }}
                                                 >
                                                     {
@@ -424,33 +437,16 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                                                         ))
                                                     }
                                                 </Select>
+                                                </Box>
                                             }
-                                
-                                            // if(input.type === 'file'){
-                                            //     // initial.imageFile = {}
-                                            //     return <TextField 
-                                            //     key={i}
-                                            //     fullWidth={input.fullWidth}
-                                            //     variant="filled"
-                                            //     type={input.type}
-                                            //     label={input.lable}
-                                            //     onBlur={handleBlur}
-                                            //     onChange={(e) => {
-                                            //         setFieldValue('imageFile' , e.currentTarget.files[0])
-                                            //         handleChange(e)
-                                            //     }}
-                                            //     value={values[input.name]}
-                                            //     name={input.name}
-                                            //     error={!!touched[input.name] && !!errors[input.name]}
-                                            //     helperText={touched[input.name] && errors[input.name]}
-                                            //     sx={{ 
-                                            //         gridColumn: "span 2",
-                                            //     }}
-                                            // />
-                                            // }
 
                                             if(input.type === 'file'){
-                                                return <>
+                                                return <Box
+                                                sx={{
+                                                  gridColumn: "span 2",
+                                              }}
+                                              key={i}
+                                                >
                                                     <Button
                                                             component="label"
                                                             variant="contained"
@@ -458,17 +454,22 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                                                             href="#file-upload"
                                                             fullWidth
                                                             color='secondary'
-                                                            sx={{
-                                                                gridColumn: "span 2",
-                                                            }}
+                                                            
                                                         >
                                                             Upload a file
                                                             <VisuallyHiddenInput onChange={(e) => {
                                                                 setFieldValue('imageFile' , e.currentTarget.files[0])
                                                                 handleChange(e)
+                                                                
                                                                 handleSelectImage(e)
-                                                            }} type="file" name="image" value={values.image} />
+                                                            }} onBlur={handleBlur} type="file" name="image" value={values.image} />
+                                                            
                                                         </Button>
+                                                        {touched.image && errors.image && (
+                                                          <FormHelperText error>
+                                                            {errors.image}
+                                                          </FormHelperText>
+                                                        )}
                                                         {
                                                             imagePreview && (
                                                                 <Box
@@ -491,7 +492,7 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                                                             )
                                                         }
                                                 
-                                                </>
+                                                </Box>
                                             }
                                 
                                 

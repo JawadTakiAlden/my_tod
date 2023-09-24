@@ -1,9 +1,9 @@
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ImageList, ImageListItem, Input, Snackbar, TextField, useMediaQuery, useTheme } from '@mui/material'
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormHelperText, IconButton, ImageList, ImageListItem, Input, Snackbar, TextField, useMediaQuery, useTheme } from '@mui/material'
 import React, { useState } from 'react'
 import GridBox from '../components/GridBox'
 import GridItem from '../components/GridItem'
 import image from '../assets/images/5.jpg'
-import { AddOutlined, DeleteOutlined, PlusOneOutlined } from '@mui/icons-material'
+import { AddOutlined, CloudUpload, DeleteOutlined, PlusOneOutlined } from '@mui/icons-material'
 import { tokens } from '../assets/theme'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -14,6 +14,7 @@ import { baseURLImage, request } from '../api/request'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
 import AddImage from '../assets/images/add.png'
 import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
+import { VisuallyHiddenInput } from '../components/VisuallyHiddenInput'
 
 
 const getEventImagsFromServer = (id) => {
@@ -57,6 +58,12 @@ const Event = () => {
   const [messageType , setMessageType] = useState("")
   const isNonMobile = useMediaQuery("(min-width:600px)")
   const {eventID} = useParams()
+  const [imagePreview, setImagePreview] = useState(null);
+ const handleSelectImage = (event) => {
+        const file = event.target.files[0];
+        
+        setImagePreview(URL.createObjectURL(file))
+      }
 
   // dealing with APIs
 
@@ -79,6 +86,7 @@ const Event = () => {
       setOpenSnackbar(true)
       eventImagesQuery.refetch()
       AddImageDialogClose()
+      setImagePreview(null)
     },
     onError : (error) => {
             if (error.response){
@@ -241,7 +249,7 @@ const Event = () => {
   }
 
 
-  if(eventImagesQuery.isLoading || addNewImageMutation.isLoading){
+  if(eventImagesQuery.isLoading || addNewImageMutation.isLoading || deleteImageMutation.isLoading){
     return <CubeLoader />
   }
 
@@ -387,26 +395,56 @@ const Event = () => {
                   "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
                 }}
               >
-                <TextField
-                    fullWidth
-                    variant="filled"
-                    type="file"
-                    label="Image"
-                    onBlur={handleBlur}
-                    multiple
-                    onChange={(e) => {
-                      setFieldValue('imageFile' , e.currentTarget.files)
-                      handleChange(e)
-                    }}
-                    inputProps={{
-                      multiple : true
-                    }}
-                    value={values.image}
-                    name="image"
-                    error={!!touched.image && !!errors.image}
-                    helperText={touched.image && errors.image}
-                    sx={{ gridColumn: "span 4" }}
-                />
+                <Box
+                  sx={{ gridColumn: "span 4" }}
+                        >
+                            <Button
+                                    component="label"
+                                    variant="contained"
+                                    startIcon={<CloudUpload />}
+                                    href="#file-upload"
+                                    fullWidth
+                                    color='secondary'
+                                    sx={{
+                                        marginBottom : '10px'
+                                    }}
+                                >
+                                    Upload a file
+                                    <VisuallyHiddenInput onChange={(e) => {
+                                        setFieldValue('imageFile' , e.currentTarget.files)
+                                        handleChange(e)
+                                        handleSelectImage(e)
+                                    }} onBlur={handleBlur} multiple type="file" name="image" value={values.image} />
+                                    
+                                </Button>
+                                {touched.image && errors.image && (
+                                    <FormHelperText error>
+                                    {errors.image}
+                                    </FormHelperText>
+                                )}
+                                {
+                                    imagePreview && (
+                                        <Box
+                                            sx={{
+                                                gridColumn: "span 4",
+                                                textAlign : 'center',
+                                                maxHeight : '200px',
+                                                overflowY: 'auto'
+                                            }}
+                                        >
+                                        <img 
+                                            src={imagePreview}
+                                            style={{
+                                                maxWidth : '200px',
+                                                borderRadius :'10px',
+                                                border : '1px dotted #888'
+                                            }}
+                                        />
+                                        </Box>
+                                    )
+                                }
+                        
+                </Box>
 
               </Box>
               <Box display="flex" justifyContent="end" mt="20px">

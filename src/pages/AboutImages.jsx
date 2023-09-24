@@ -14,7 +14,7 @@ import { VisuallyHiddenInput } from '../components/VisuallyHiddenInput';
 
 const addImageToServer = (file) => {
     return request({
-        url : '/post',
+        url : '/aboutImages',
         method : 'POST',
         headers : {
           "Content-Type": "multipart/form-data"
@@ -23,20 +23,21 @@ const addImageToServer = (file) => {
     })
 }
 
-const getPublicImagesFromServer = () => {
+const getAboutImagesFromServer = () => {
     return request({
-        url : '/post',
+        url : '/aboutImages',
     })
 }
 
 const deleteImageFromServer = (id) => {
   return request({
-    url : `/post/${id}`,
+    url : `/aboutImages/${id}`,
     method : 'delete'
   })
 }
 
-const PublicImages = () => {
+const AboutImages = () => {
+    const navigate = useNavigate()
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
     const [open, setOpen] = useState(false);
@@ -46,7 +47,7 @@ const PublicImages = () => {
     const [deleteDialogOpen , setDeleteDialogOpen] = useState(false)
     const [clickedImage , setClickedImage] = useState()
     const [imagePreview, setImagePreview] = useState(null);
-    const handleSelectImage = (event) => {
+ const handleSelectImage = (event) => {
         const file = event.target.files[0];
         
         setImagePreview(URL.createObjectURL(file))
@@ -77,16 +78,16 @@ const PublicImages = () => {
     deleteImageDialogClose()
   }
 
-    const getPublicImagesFromServerQuery = useQuery({
-        queryKey : ['get-public-images-from-server'],
-        queryFn : getPublicImagesFromServer
+    const getAboutImagesFromServerQuery = useQuery({
+        queryKey : ['get-About-images-from-server'],
+        queryFn : getAboutImagesFromServer
     })
 
     const deleteImageMutation = useMutation({
       mutationKey : ['delete-image-from-server'],
       mutationFn : deleteImageFromServer,
       onSuccess : (data) => {
-        getPublicImagesFromServerQuery.refetch()
+        getAboutImagesFromServerQuery.refetch()
         setMessage('an image deleted successfully')
           setMessageType('warning')
           setOpenSnackbar(true)
@@ -138,13 +139,14 @@ const PublicImages = () => {
     })
 
     const addImageMutation = useMutation({
-        mutationKey : ['add-public-image-to-server'],
+        mutationKey : ['add-About-image-to-server'],
         mutationFn : addImageToServer,
         onSuccess : (data) => {
-          getPublicImagesFromServerQuery.refetch()
+          getAboutImagesFromServerQuery.refetch()
           setMessage('new image added successfully')
           setMessageType('success')
           setOpenSnackbar(true)
+          setImagePreview(null)
           },
           onError : (error) => {
             if (error.response){
@@ -226,12 +228,12 @@ const PublicImages = () => {
         setOpen(false)
 
     }
-    if(getPublicImagesFromServerQuery.isLoading || addImageMutation.isLoading || deleteImageMutation.isLoading){
+    if(getAboutImagesFromServerQuery.isLoading || addImageMutation.isLoading || deleteImageMutation.isLoading){
       return <CubeLoader />
     }
   
-    if(getPublicImagesFromServerQuery.isError){
-      return <GetErrorHandler error={getPublicImagesFromServerQuery.error} refetch={getPublicImagesFromServerQuery.refetch} />
+    if(getAboutImagesFromServerQuery.isError){
+      return <GetErrorHandler error={getAboutImagesFromServerQuery.error} refetch={getAboutImagesFromServerQuery.refetch} />
     }
 
   return (
@@ -240,7 +242,7 @@ const PublicImages = () => {
     <AddButton color={colors.pinkAccent[500]} reactionFunction={handleClickOpen} />
     <Box sx={{ width: '100%', height: '100%'}}>
       {
-        getPublicImagesFromServerQuery.data.data.posts.length === 0 && (
+        getAboutImagesFromServerQuery.data.data.aboutImages.length === 0 && (
           <Typography
           sx={{
             color : colors.pinkAccent[500],
@@ -248,12 +250,12 @@ const PublicImages = () => {
           }}
           variant='h2'
         >
-          No Posts until now
+          No Images until now
         </Typography>
         )
       }
       <ImageList variant="masonry" cols={3} gap={8}>
-        {getPublicImagesFromServerQuery.data.data.posts.map((item,i) => (
+        {getAboutImagesFromServerQuery.data.data.aboutImages.map((item,i) => (
           <ImageListItem 
             key={i}
             sx={{
@@ -284,7 +286,7 @@ const PublicImages = () => {
             </IconButton>
             <img
               src={`${baseURLImage}${item.image_url}?w=248&fit=crop&auto=format`}
-              srcSet={`http://127.0.0.1:8000${item.image_url}?w=248&fit=crop&auto=format&dpr=2 2x`}
+              srcSet={`${baseURLImage}${item.image_url}?w=248&fit=crop&auto=format&dpr=2 2x`}
               alt={item.title}
               loading="lazy"
               style={{
@@ -434,7 +436,7 @@ const PublicImages = () => {
   )
 }
 
-export default PublicImages
+export default AboutImages
 
 const initialValues = {
     image : '',

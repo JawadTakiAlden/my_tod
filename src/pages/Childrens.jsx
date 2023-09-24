@@ -89,7 +89,7 @@ const validationSchema = Yup.object({
   name : Yup.string().required('name field is requied'),
   image : Yup.string().required('image field is requied'),
   isExtra : Yup.boolean().required('is extra field is required'),
-  gender : Yup.string().required('gender field is required'),
+  sex : Yup.string().required('gender field is required'),
   parent_id : Yup.string().required('parent is a required field'),
   classRoom_id : Yup.string().required('class room is a required field')
 })
@@ -166,7 +166,7 @@ const Childrens = () => {
         valueOptions : parentsSelectOptions
       },
       {
-        name : 'gender',
+        name : 'sex',
         lable : 'Gender',
         type : 'select',
         fullWidth : true,
@@ -198,12 +198,12 @@ const Childrens = () => {
         name : '',
         image : '',
         isExtra : 0,
-        gender : 'mail',
+        sex : 'mail',
         parent_id : '',
         classRoom_id : classesSelectOptions.length > 0  ? 1 : '' 
       }}
         validationSchema={validationSchema}
-        valuesShouldUpdate={['name' , 'isExtra' , 'gender']}
+        valuesShouldUpdate={['name' , 'isExtra' , 'sex']}
         updateAPI={'/children'}
         refetch={childrensQuery.refetch}
     />

@@ -1,5 +1,5 @@
-import { Box, Button, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material'
-import React from 'react'
+import { Alert, Box, Button, List, ListItem, ListItemIcon, ListItemText, Snackbar, Typography } from '@mui/material'
+import React, { useState } from 'react'
 import StatsticsCards from '../layouts/StatsticsCards'
 import ReadableCards from '../layouts/ReadableCards'
 import { useQuery } from '@tanstack/react-query'
@@ -18,7 +18,13 @@ const getStatsticsFromServer = () => {
 }
 
 const Dashboard = () => {
-  const navigate = useNavigate()
+  const [openSnackbar , setOpenSnackbar] = useState(false)
+    const [message , setMessage] = useState("")
+    const [messageType , setMessageType] = useState("")
+
+    const handelAlterClose = () => {
+      setOpenSnackbar(false)
+    }
   const {data , isLoading , isError , error , refetch} = useQuery({
     queryKey : ['get-statstics-from*server'],
     queryFn : getStatsticsFromServer
@@ -32,14 +38,21 @@ const Dashboard = () => {
     return <GetErrorHandler error={error} refetch={refetch} />
   }
   return (
-    <Box
-      sx={{
-        padding : '20px 0'
-      }}
-    >
-      <StatsticsCards statstics={data?.data} />
-      <ReadableCards />
-    </Box>
+    <>
+      <Box
+        sx={{
+          padding : '20px 0'
+        }}
+      >
+        <StatsticsCards statstics={data?.data} />
+        <ReadableCards setMessage={setMessage} setMessageType={setMessageType} setaAlterOpen={setOpenSnackbar} />
+      </Box>
+      <Snackbar open={openSnackbar} autoHideDuration={4000} onClose={handelAlterClose}>
+        <Alert onClose={handelAlterClose} severity={messageType} sx={{ width: '100%' }}>
+            {message}
+        </Alert>
+      </Snackbar>
+    </>
   )
 }
 

@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Menu, MenuItem, Sidebar, sidebarClasses } from 'react-pro-sidebar'
 import { tokens } from '../assets/theme'
 import Logo from '../assets/images/logo.png'
-import { ChildFriendlyOutlined, ClassOutlined, CloseOutlined, DashboardOutlined, EscalatorWarning, EventOutlined, GolfCourseOutlined, ImageOutlined, ImportContactsOutlined, LeaderboardOutlined, MenuOutlined, PeopleOutlined, QuestionMarkOutlined, SchoolOutlined } from '@mui/icons-material'
+import { ChildFriendlyOutlined, ClassOutlined, CloseOutlined, DashboardOutlined, EscalatorWarning, EventOutlined, GolfCourseOutlined, ImageOutlined, ImportContactsOutlined, LeaderboardOutlined, MenuOutlined, PeopleOutlined, QuestionMarkOutlined, SchoolOutlined, SchoolRounded } from '@mui/icons-material'
 import {Link, useLocation} from 'react-router-dom'
 import { setOpenSidebar, useJawadAuthController } from '../context'
 
@@ -32,15 +32,41 @@ const MyItem = ({ title, to, icon }) => {
 const DashboardSidebar = () => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
-  const [controller] = useJawadAuthController()
+  const [controller , dispatch] = useJawadAuthController()
   return (
+    <>
+    {
+       controller.openSidebar 
+       ? (
+          <Box
+          sx={{
+            width : '100%',
+            height : '100vh',
+            left : '0',
+            top : '0',
+            position : 'absolute',
+            backgroundColor : 'rgba(0, 9, 47, 0.6)',
+            zIndex :'100',
+            cursor : 'pointer'
+          }}
+          onClick={() => {
+            setOpenSidebar(dispatch , false)
+          }}
+        >
+
+        </Box>
+       )
+       : undefined
+    }
+    
     <Sidebar
       collapsed = {false}
+      transitionDuration={200}
       rootStyles={{
         borderRight : 'none',
         position : 'fixed',
+        zIndex : '300',
         borderLeft : 'none !important',
-        zIndex : '10',
         backgroundColor : colors.blueAccent[900],
         height : '100vh',
         left : controller.openSidebar ? '5px' : '-250px',
@@ -87,18 +113,20 @@ const DashboardSidebar = () => {
       <Menu>
         <MyItem title={'Dashboard'} to={'/dashboard'} icon={<DashboardOutlined />} />
         <MyItem title={'Parents'} to={'/parents'} icon={<PeopleOutlined />} />
-        <MyItem title={'Stuffs'} to={'/stuffs'} icon={<LeaderboardOutlined />} />
+        <MyItem title={'Staffs'} to={'/staffs'} icon={<LeaderboardOutlined />} />
         <MyItem title={'Classes'} to={'/classes'} icon={<ClassOutlined />} />
         {/* <MyItem title={'Courses'} to={'/courses'} icon={<GolfCourseOutlined />} /> */}
-        <MyItem title={'Childrens'} to={'/childrens'} icon={<SchoolOutlined />} />
+        <MyItem title={'Children'} to={'/childrens'} icon={<SchoolOutlined />} />
         <MyItem title={'Age-Sections'} to={'/age-sections'} icon={<EscalatorWarning />} />
         <MyItem title={'FAQs'} to={'/faqs'} icon={<QuestionMarkOutlined />} />
         <MyItem title={'Events'} to={'/events'} icon={<EventOutlined />} />
         <MyItem title={'Status'} to={'/status'} icon={<ImportContactsOutlined />} />
         <MyItem title={'Images'} to={'/images'} icon={<ImageOutlined />} />
+        <MyItem title={'School-Photos'} to={'/school-photos'} icon={<SchoolRounded />} />
       </Menu>
       
     </Sidebar>
+    </>
   )
 }
 

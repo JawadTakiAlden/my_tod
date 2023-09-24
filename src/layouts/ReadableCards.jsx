@@ -6,8 +6,18 @@ import { tokens } from '../assets/theme'
 import { NoteOutlined } from '@mui/icons-material'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
+import { request } from '../api/request'
+import { useMutation } from '@tanstack/react-query'
 
-const ReadableCards = () => {
+const sendNotification = (values) => {
+    return request({
+        url : '/sendNotification',
+        method : 'post',
+        data : values
+    })
+}
+
+const ReadableCards = ({setMessage , setMessageType , setaAlterOpen}) => {
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
     const [open, setOpen] = React.useState(false);
@@ -20,8 +30,63 @@ const ReadableCards = () => {
         setOpen(false);
     };
 
+    const sendNotificationMutation = useMutation({
+        mutationKey : ['send-notification-for-user'],
+        mutationFn : sendNotification,
+        onSuccess : () => {
+            setMessage('Notification Sent Successfully')
+            setMessageType('success')
+            setaAlterOpen(true)
+            setOpen(false)
+        },
+        onError : (error) => {
+            if (error.response){
+              switch(error.response.status){
+                case 401 : {
+                    setMessage('you are not authorize to get in our system')
+                  setMessageType('error')
+                  setaAlterOpen(true)
+                  break
+                }
+                case 422 : {
+                    setMessage('wrong entered data')
+                  setMessageType('error')
+                  setaAlterOpen(true)
+                  break
+                }
+                case 500 : {
+                    setMessage('we have a problem in our server , come later')
+                  setMessageType('error')
+                  setaAlterOpen(true)
+                  break
+                }
+                case 404 : {
+                    setMessage("we out of space , we can't find your destenation")
+                  setMessageType('error')
+                  setaAlterOpen(true)
+                  break
+                }
+                default : {
+                    setMessage("unkown error accoure : request falid with status code" + error.response.status)
+                  setMessageType('error')
+                  setaAlterOpen(true)
+                  break
+                }
+              }
+            }else if(error.request){
+                setMessage('server response with nothing , Check your internet connection or contact support if the problem persists')
+              setMessageType('error')
+              setaAlterOpen(true)
+            }else {
+                setMessage('unknow error : ' + error.message)
+              setMessageType('error')
+              setaAlterOpen(true)
+            }
+          }
+    })
+
     const sendNotificationHandler = (values) => {
-        console.log(values)
+        sendNotificationMutation.mutate(values)
     }
   return (
     <>
@@ -195,17 +260,31 @@ const ReadableCards = () => {
                 ({handleBlur , handleChange , handleSubmit , values , errors , touched}) => (
                     <form onSubmit={handleSubmit}>
                         <TextField
-                            label="Message"
-                            multiline
-                            rows={4}
-                            value={values.message}
-                            name='message'
+                            label="Title"
+                            value={values.title}
+                            name='title'
                             fullWidth
                             variant="outlined"
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            error={!!touched.message && !!errors.message}
-                            helperText={touched.message && errors.message}
+                            error={!!touched.title && !!errors.title}
+                            helperText={touched.title && errors.title}
+                            sx={{
+                                mb : 1,
+                            }}
+                        />
+                        <TextField
+                            label="Message"
+                            multiline
+                            rows={4}
+                            value={values.message}
+                            name='body'
+                            fullWidth
+                            variant="outlined"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={!!touched.body && !!errors.body}
+                            helperText={touched.body && errors.body}
                         />
                         <Box
                             sx={{
@@ -234,11 +313,13 @@ const ReadableCards = () => {
 }
 
 const initialValues = {
-    message : ''
+    body : '',
+    title : ''
 }
 
 const validationSchema = Yup.object({
-    message : Yup.string().required('message is required')
+    body : Yup.string().required('message is required'),
+    title : Yup.string().required('title is required')
 })
 
 export default ReadableCards

@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, TextField, Typography, useTheme } from '@mui/material'
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormHelperText, Snackbar, TextField, Typography, useTheme } from '@mui/material'
 import React from 'react'
 import EventCard from '../layouts/EventCard'
 import GridBox from '../components/GridBox'
@@ -12,6 +12,8 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { request } from '../api/request'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
 import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
+import { VisuallyHiddenInput } from '../components/VisuallyHiddenInput'
+import { CloudUpload } from '@mui/icons-material'
 
 
 const getEeventFromServer = () => {
@@ -41,6 +43,12 @@ const Events = () => {
     const [open , setOpen] = useState(false)
     const [message , setMessage] = useState("")
     const [messageType , setMessageType] = useState("")
+    const [imagePreview, setImagePreview] = useState(null);
+ const handleSelectImage = (event) => {
+        const file = event.target.files[0];
+        
+        setImagePreview(URL.createObjectURL(file))
+      }
     const onAddEventDialogOpen = () => {
         setAddEventDialogOpen(true)
     }
@@ -71,6 +79,7 @@ const Events = () => {
             setMessage('new event added successfully')
             setMessageType('success')
             setOpen(true)
+            setImagePreview(null)
         },
         onError : (error) => {
             if (error.response){
@@ -128,7 +137,7 @@ const Events = () => {
     }
     
 
-      if(events.isLoading){
+      if(events.isLoading || createNewEvent.isLoading){
         return <CubeLoader />
       }
 
@@ -222,23 +231,56 @@ const Events = () => {
                             helperText={touched.name && errors.name}
                             sx={{ gridColumn: "span 4" }}
                         />
-                        <TextField
-                            fullWidth
-                            variant="filled"
-                            type="file"
-                            label="Image"
-                            onBlur={handleBlur}
-                            // onChange={handleChange}
-                            onChange={(e) => {
-                                        setFieldValue('imageFile' , e.currentTarget.files[0])
-                                        handleChange(e)
-                                    }}
-                            value={values.image}
-                            name="image"
-                            error={!!touched.image && !!errors.image}
-                            helperText={touched.image && errors.image}
-                            sx={{ gridColumn: "span 4" }}
-                        />
+                        <Box
+                            >
+                                <Button
+                                        component="label"
+                                        variant="contained"
+                                        startIcon={<CloudUpload />}
+                                        href="#file-upload"
+                                        fullWidth
+                                        color='secondary'
+                                        sx={{
+                                            marginBottom : '10px'
+                                        }}
+                                    >
+                                        Upload a file
+                                        <VisuallyHiddenInput onChange={(e) => {
+                                            setFieldValue('imageFile' , e.currentTarget.files[0])
+                                            handleChange(e)
+                                            
+                                            handleSelectImage(e)
+                                        }} onBlur={handleBlur} type="file" name="image" value={values.image} />
+                                        
+                                    </Button>
+                                    {touched.image && errors.image && (
+                                        <FormHelperText error>
+                                        {errors.image}
+                                        </FormHelperText>
+                                    )}
+                                    {
+                                        imagePreview && (
+                                            <Box
+                                                sx={{
+                                                    gridColumn: "span 4",
+                                                    textAlign : 'center',
+                                                    maxHeight : '200px',
+                                                    overflowY: 'auto'
+                                                }}
+                                            >
+                                            <img 
+                                                src={imagePreview}
+                                                style={{
+                                                    maxWidth : '200px',
+                                                    borderRadius :'10px',
+                                                    border : '1px dotted #888'
+                                                }}
+                                            />
+                                            </Box>
+                                        )
+                                    }
+                            
+                        </Box>
                         </Box>
                         <Box display="flex" justifyContent="end" mt="20px">
                         <Button type="submit" color="success" variant="contained">

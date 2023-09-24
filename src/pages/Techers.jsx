@@ -79,7 +79,7 @@ const Techers = () => {
     }
   return (
     <Page 
-      name={'stuff'} 
+      name={'staff'} 
       data={data.data.data} 
       columns={techersColumns}
       link={{

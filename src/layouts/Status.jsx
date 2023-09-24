@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, Select, Snackbar, TextField, useTheme } from '@mui/material'
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, Select, Snackbar, TextField, Typography, useTheme } from '@mui/material'
 import React from 'react'
 import GridBox from '../components/GridBox'
 import GridItem from '../components/GridItem'
@@ -139,6 +139,19 @@ const Status = () => {
     <>
     <Box>
         <AddButton color={colors.indigoAccent[500]} reactionFunction={onAddStatusDialogOpen} />
+        {
+          getStatusQuery.data.data.length === 0 && (
+            <Typography
+            sx={{
+              color : colors.pinkAccent[500],
+              textAlign : 'center'
+            }}
+            variant='h2'
+          >
+            No Status until now
+          </Typography>
+          )
+        }
         <GridBox
             spacing={2}
         >

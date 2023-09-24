@@ -6,6 +6,8 @@ import { request } from '../api/request'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
 import { useNavigate } from 'react-router'
 import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
+import { Grid, List, ListItem, ListItemText, Typography, useTheme } from '@mui/material'
+import { tokens } from '../assets/theme'
 
 const validationSchema = Yup.object({
   name : Yup.string().required('class name field is required'),
@@ -14,39 +16,7 @@ const validationSchema = Yup.object({
 })
 
 
-const classColumns = [
-  {
-      field : 'id',
-      headerName : 'ID',
-      width : 50
-  },
-  {
-      field : 'name',
-      headerName : 'Class Name',
-      flex : 1,
-      editable : true
-      // flex : 1
-  },
-  {
-      field : 'age_section',
-      headerName : 'Age Section',
-      flex : 1,
-      valueGetter : (params) => {
-        return 'from ' + params.row.age_section.from + ' to ' + params.row.age_section.to 
-      }
-      // flex : 1
-  },
-  // {
-  //     field : 'teacher_name',
-  //     headerName : 'Teacher Name',
-  //     flex : 1,
-  //     valueGetter : (params) => {
-  //       console.log(params.row)
-  //       return params.row.teacher.first_name + ' ' + params.row.teacher.last_name 
-  //     }
-  //     // flex : 1
-  // },
-]
+
 
 const getClassesFromServer = () => {
   return request({
@@ -92,6 +62,8 @@ const OrgnizeAgeSectionData = (values) => {
 }
 
 const Classes = () => {
+  const theme = useTheme()
+  const colors = tokens(theme.palette.mode)
   const {isLoading , isError , error , data , refetch} = useQuery({
     queryKey : ['get-classes-from-server'],
     queryFn : getClassesFromServer
@@ -127,7 +99,46 @@ const Classes = () => {
 
   const ageSection = ageSectionQuery.data.data.data
 
+  const classColumns = [
+    {
+        field : 'id',
+        headerName : 'ID',
+        width : 50
+    },
+    {
+        field : 'name',
+        headerName : 'Class Name',
+        flex : 1,
+        editable : true
+        // flex : 1
+    },
+    {
+        field : 'age_section',
+        headerName : 'Age Section',
+        flex : 1,
+        valueGetter : (params) => {
+          console.log(params.row)
+          return params.row.age_section
+        },
+        valueFormatter : (params) => {
+          return 'from : ' + params.value.from + ' to : ' + params.value.to
+        },
+    },
+    {
+        field : 'teacher_id',
+        headerName : 'Teacher ID',
+        flex : 1,
+        type : 'singleSelect',
+        valueOptions : () => {
+          return teachers.map(obj => obj.id)
+        },
+        
+        editable : true
+    }
+  ]
+
   return (
+    <>
     <Page 
       name={'class'} 
       data={data.data} 
@@ -166,10 +177,48 @@ const Classes = () => {
         age_section_id : '',
       }}
       validationSchema={validationSchema}
-      valuesShouldUpdate={['name']}
+      valuesShouldUpdate={['name' , 'teacher_id']}
       updateAPI={'/classroom'}
       refetch={refetch}
     />
+    <Grid container sx={{
+      marginTop : '10px'
+    }}>
+      {
+        teachers.length > 0
+        ? (
+          <Grid item xs={12}>
+            <Typography
+              sx={{
+                textAlign : 'center',
+                fontSize  : '30px',
+                color : colors.yellowAccent[500]
+              }}
+            >
+              Avialible Teacher
+            </Typography>
+            <List>
+              {
+                teachers.map(teacher => (
+                  <ListItem key={teacher.id}>
+                    <ListItemText
+                      sx={{
+                        textAlign : 'center'
+                      }}
+                    >
+                      {`${teacher.id} - ${teacher.first_name} ${teacher.last_name}`}
+                    </ListItemText>
+                  </ListItem>
+                ))
+              }
+            </List>
+          </Grid>
+        )
+        : undefined
+      }
+      
+    </Grid>
+    </>
   )
 }
 

@@ -23,13 +23,12 @@ import { useQuery } from "@tanstack/react-query";
 import { request } from "../api/request";
 import CubeLoader from "../components/CubeLoader/CubeLoader";
 import NetworkError from "./Errors/NetworkError";
+import { GetErrorHandler } from "../helper/GetErrorHandlerHelper";
 
 const ShowParentInformation = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { parentID } = useParams();
-
-  const navigate = useNavigate();
   const getParent = () => {
     return request({ url: `/accounts/${parentID}` });
   };
@@ -38,22 +37,19 @@ const ShowParentInformation = () => {
     queryKey: [`get-parent-${parentID}-details`],
     queryFn: getParent,
   });
-  const parent = data?.data.account;
-  const children = data?.data.account.children;
+  
   if (isLoading) {
     return <CubeLoader />;
   }
 
   if (isError) {
-    if (error.response.status === 401) {
-      navigate("/auth/signin");
-    } else if (error.message === "Network Error") {
-      return <NetworkError />;
-    } else {
-      refetch();
-    }
+    <GetErrorHandler error={error} refetch={refetch} />
   }
-  console.log(parent, children);
+
+  const parent = data?.data.account
+  const children = data?.data.account.children;
+
+
   return (
     <Box>
       <List>
@@ -93,7 +89,7 @@ const ShowParentInformation = () => {
             Username : {parent.username}
           </ListItemText>
         </ListItem>
-        <ListItem>
+        {/* <ListItem>
           <ListItemIcon>
             <NumbersOutlined />
           </ListItemIcon>
@@ -104,7 +100,7 @@ const ShowParentInformation = () => {
           >
             Children count : {children.length}
           </ListItemText>
-        </ListItem>
+        </ListItem> */}
         <ListItem>
           <ListItemIcon>
             <Phone />
@@ -161,7 +157,7 @@ const ShowParentInformation = () => {
       </Box>
       <Box>
         <GridBox spacing={1}>
-          {children.map((item) => {
+          {children?.map((item) => {
             return (
               <GridItem key={item.id} xs={12} sm={6} md={4} lg={3}>
                 <ChildCard classRoomName={item?.class_room?.name} child={item} />

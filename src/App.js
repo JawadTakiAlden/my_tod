@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import './App.css'
 import { ColorModeContext, useMode } from './assets/theme'
 import { Box, CssBaseline, ThemeProvider } from '@mui/material'
-import { Route, Routes, useLocation } from 'react-router'
+import { Route, Routes, useLocation, useNavigate } from 'react-router'
 import Dashboard from './pages/Dashboard'
 import Header from './layouts/Header'
 import DashboardSidebar from './layouts/DashboardSidebar'
@@ -26,6 +26,20 @@ import StuffInformation from './pages/StuffInformation'
 import Childrens from './pages/Childrens'
 import ChildInformation from './pages/ChildInformation'
 import AgeSection from './pages/AgeSection'
+import AboutImages from './pages/AboutImages'
+import { useJawadAuthController } from './context'
+
+const CheckAuth = () => {
+  const [controller] = useJawadAuthController()
+  const navigate = useNavigate()
+  useEffect(() => {
+    if(controller.isAuth) {
+      navigate('/dashboard')
+    }else{
+      navigate('/auth/signin')
+    }
+  } , [])
+}
 
 const App = () => {
   const [theme, colorMode] = useMode();
@@ -51,6 +65,7 @@ const App = () => {
             >
               <Header />
               <Routes>
+                <Route path='/' element={<CheckAuth />} />
                 <Route path={'/dashboard'} element={<Dashboard />} />
                 <Route path={'/parents'} element={<Parents />} />
                 <Route path={'/parents/:parentID'} element={<ShowParentInformation />} />
@@ -62,14 +77,15 @@ const App = () => {
                 <Route path={'/events/:eventID'} element={<Event />} />
                 <Route path={'/status'} element={<Status />} />
                 <Route path={'/status/:statusID'} element={<StatusInfo />} />
-                <Route path={'/stuffs'} element={<Techers />} />
-                <Route path={'/stuffs/:stuffID'} element={<StuffInformation />} />
+                <Route path={'/staffs'} element={<Techers />} />
+                <Route path={'/staffs/:stuffID'} element={<StuffInformation />} />
                 <Route path={'/age-sections'} element={<AgeSection />} />
                 <Route path={'/classes'} element={<Classes />} />
-                {/* <Route path={'/classes/:classID'} element={<ClassInformation />} />
-                <Route path={'/courses'} element={<Courses />} /> */}
-                <Route path={'/courses/:courseID'} element={<CourseInforamtion />} />
+                <Route path={'/classes/:classID'} element={<ClassInformation />} />
+                {/* <Route path={'/courses'} element={<Courses />} /> */}
+                {/* <Route path={'/courses/:courseID'} element={<CourseInforamtion />} /> */}
                 <Route path={'/images'} element={<PublicImages />} />
+                <Route path={'/school-photos'} element={<AboutImages />} />
               </Routes>
             </Box>
           </Box>
