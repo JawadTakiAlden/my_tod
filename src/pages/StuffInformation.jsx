@@ -6,9 +6,6 @@ import { useQuery } from '@tanstack/react-query'
 import { request } from '../api/request'
 import { useParams } from 'react-router'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
-import GridBox from '../components/GridBox'
-import GridItem from '../components/GridItem'
-import ChildCard from '../layouts/ChildCard'
 
 
 const getStuffFromServer = (id) => {
