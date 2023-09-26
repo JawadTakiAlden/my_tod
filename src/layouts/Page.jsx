@@ -582,6 +582,13 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
           "& .MuiDataGrid-toolbarContainer" : {
             backgroundColor : colors.yellowAccent[500]
           },
+          "& .MuiDataGrid-booleanCell" : {
+            border : `1px solid ${colors.yellowAccent[500]}`,
+            borderRadius : '2px'
+          },
+          "& .MuiCheckbox-root" : {
+            color : `#888 !important`
+          }
         }}
         disableRowSelectionOnClick
         onCellEditStop={(params) => setRowId(params.id)}
