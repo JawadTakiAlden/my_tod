@@ -99,6 +99,9 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
       username : '',
       password : ''
     })
+    const [isIdHide , setIsHide] = useState({
+      id : false
+    })
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
     const isNoneMobile = useMediaQuery('(min-width : 600px')
@@ -539,7 +542,7 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
         <Box>
         <Box 
       sx={{ 
-         height : '500px',
+         height : 'calc(100vh - 150px)',
          width : '100%',
       }}
     >
@@ -549,12 +552,16 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
         initialState={{
           pagination: {
             paginationModel: {
-              pageSize: 5,
+              pageSize: 8,
             },
           },
+          
         }}
-        
-        pageSizeOptions={[5 , 10]}
+        columnVisibilityModel={isIdHide}
+        onColumnVisibilityModelChange={(newModel) => {
+          setIsHide(newModel)
+        }}
+        pageSizeOptions={[8 , 15]}
         sx={{
           '& .MuiDataGrid-columnHeaders' : {
             backgroundColor : colors.yellowAccent[500]

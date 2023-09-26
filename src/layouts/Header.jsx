@@ -44,7 +44,13 @@ const Header = () => {
         marginBottom: "15px",
       }}
     >
-        <Box>
+        <Box
+          sx={{
+            bgcolor : theme.palette.mode === 'light' ? theme.palette.secondary.light : 'transparent',
+            padding : '6px',
+            borderRadius : '20px 0px 20px 0px'
+          }}
+        >
           <img style={{ width: "130px" }} src={logo} alt="logo" />
         </Box>
       

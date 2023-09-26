@@ -36,8 +36,6 @@ const ChildInformation = () => {
         
         setImagePreview(URL.createObjectURL(file))
       }
-
-    console.log(data)
     const initialValues = {
         image : '',
         imageFile : ''

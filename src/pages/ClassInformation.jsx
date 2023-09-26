@@ -86,13 +86,13 @@ const ClassInformation = () => {
             }}
           >
             teacher : {teacher.first_name} {teacher.last_name}
-            <Link
+            {/* <Link
               to={`/stuffs/${teacher.id}`}
               style={{ color: colors.yellowAccent[500] }}
             >
               {" "}
               more...
-            </Link>
+            </Link> */}
           </ListItemText>
         </ListItem>
       </List>

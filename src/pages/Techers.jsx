@@ -5,7 +5,6 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { request } from '../api/request'
 import CubeLoader from '../components/CubeLoader/CubeLoader'
-import { useNavigate } from 'react-router'
 import { GetErrorHandler } from '../helper/GetErrorHandlerHelper'
 
 
@@ -13,7 +12,8 @@ const techersColumns = [
   {
       field : 'id',
       headerName : 'ID',
-      width : 50
+      width : 50,
+      hide : true
   },
   {
       field : 'first_name',
@@ -36,7 +36,6 @@ const techersColumns = [
     headerName : 'Username',
     flex : 1,
     minWidth : 150,
-    editable : true
     // flex : 1
 },
   {

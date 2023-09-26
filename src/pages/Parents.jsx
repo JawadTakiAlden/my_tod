@@ -56,7 +56,6 @@ const validationSchema = Yup.object({
     first_name : Yup.string().required('first name field is required'),
     last_name : Yup.string().required('username field is required'),
     phone : Yup.string().required('phone field is required'),
-    role_name : Yup.string().required('role field is required')
 })
 
 
@@ -110,16 +109,16 @@ const Parents = () => {
         initialValues : '',
         fullWidth : true
       },
-      {
-        name : 'role_name',
-        lable : 'Role',
-        type : 'select',
-        initialValues : 'parents',
-        fullWidth : true,
-        valueOptions : [
-          {name : 'parent' , value : 'parent'},
-        ]
-      },
+      // {
+      //   name : 'role_name',
+      //   lable : 'Role',
+      //   type : 'select',
+      //   initialValues : 'parents',
+      //   fullWidth : true,
+      //   valueOptions : [
+      //     {name : 'parent' , value : 'parent'},
+      //   ]
+      // },
     ]}
       initialValues={{
         first_name : '',

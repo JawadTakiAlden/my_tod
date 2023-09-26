@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import './App.css'
 import { ColorModeContext, useMode } from './assets/theme'
 import { Box, CssBaseline, ThemeProvider } from '@mui/material'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
@@ -28,6 +27,7 @@ import ChildInformation from './pages/ChildInformation'
 import AgeSection from './pages/AgeSection'
 import AboutImages from './pages/AboutImages'
 import { useJawadAuthController } from './context'
+import "./App.css"
 
 const CheckAuth = () => {
   const [controller] = useJawadAuthController()

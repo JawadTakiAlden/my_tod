@@ -54,10 +54,10 @@ const cloumns = [
         flex : 1
     },
     {
-      field : 'gender',
+      field : 'sex',
       headerName : 'Gender',
-      type : 'singelSelect',
-      valueOptions : ['mail' , 'femail'],
+      type : 'singleSelect',
+      valueOptions : ['male' , 'female'],
       minWidth : 120,
       flex : 1,
       editable : true
@@ -171,8 +171,8 @@ const Childrens = () => {
         type : 'select',
         fullWidth : true,
         valueOptions : [
-          {name : 'mail' , value : 'mail'},
-          {name : 'femail' , value : 'femail'},
+          {name : 'male' , value : 'male'},
+          {name : 'female' , value : 'female'},
         ]
       },
       {
@@ -198,7 +198,7 @@ const Childrens = () => {
         name : '',
         image : '',
         isExtra : 0,
-        sex : 'mail',
+        sex : 'male',
         parent_id : '',
         classRoom_id : classesSelectOptions.length > 0  ? 1 : '' 
       }}
