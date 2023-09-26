@@ -2,7 +2,7 @@ import { CloudUpload, PermIdentityOutlined} from '@mui/icons-material'
 import { Alert, Box, Button, ImageList, ImageListItem, List, ListItem, ListItemIcon, ListItemText, Snackbar, TextField, Typography, useTheme } from '@mui/material'
 import React, { useState } from 'react'
 import { tokens } from '../assets/theme'
-import { useLocation, useParams } from 'react-router'
+import { useLocation, useNavigate, useParams } from 'react-router'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { baseURLImage, request } from '../api/request'
@@ -20,6 +20,7 @@ const ChildInformation = () => {
     const [message , setMessage] = useState("")
     const [messageType , setMessageType] = useState("success")
     const [imagePreview, setImagePreview] = useState(null);
+    const navigate = useNavigate()
 
     const handleClose = (event, reason) => {
       if (reason === 'clickaway') {
@@ -52,7 +53,7 @@ const ChildInformation = () => {
             headers : {
                 "Content-Type" : "multipart/form-data"
             },
-            method : 'patch'
+            method : 'post'
         })
     }
     const updateImageMution = useMutation({
@@ -64,6 +65,7 @@ const ChildInformation = () => {
             setOpen(true)
             setUpdateFormOpen(false)
             setImagePreview(null)
+            navigate(-1)
         },
         onError : (error) => {
             if (error.response){

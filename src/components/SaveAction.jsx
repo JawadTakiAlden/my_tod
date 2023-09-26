@@ -16,7 +16,7 @@ const SaveAction = ({ params , rowId , setRowId , name , valuesShouldUpdate , up
     const updateInformationInServer = (values) => {
         return request({
             url : `${updateAPI}/${params.id}`,
-            method : 'PATCH',
+            method : name !== 'childrens' ? 'PATCH' : 'Post' ,
             data : values
         })
     }
