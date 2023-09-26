@@ -152,6 +152,7 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
             setMessage('one row added successfully')
             setMessageType('success')
             setOpen(true)
+            setImagePreview(null)
             if(name === 'parents' || name === 'staff'){
               setUserCreadintials({
                 username : data.data.user.username,
@@ -349,6 +350,7 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
     
     const closeAddForm = () => {
         setFormOpen(false)
+        setImagePreview(null)
     }
     // loading while requests done
     if(addToServerMutation.isLoading || deleteFromServerMutation.isLoading){

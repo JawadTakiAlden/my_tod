@@ -63,6 +63,7 @@ const ChildInformation = () => {
             setMessageType('success')
             setOpen(true)
             setUpdateFormOpen(false)
+            setImagePreview(null)
         },
         onError : (error) => {
             if (error.response){
@@ -211,7 +212,7 @@ const ChildInformation = () => {
                             <Button type="submit" color="success" variant="contained">
                             update
                             </Button>
-                            <Button onClick={() => setUpdateFormOpen(false)} color="error" variant="outlined">
+                            <Button onClick={() => { setUpdateFormOpen(false) ; setImagePreview(null) }} color="error" variant="outlined">
                             cancel
                             </Button>
                         </Box>
