@@ -4,6 +4,7 @@ import {motion} from 'framer-motion'
 import React, { useRef } from 'react'
 import { useState } from 'react'
 import { tokens } from '../assets/theme'
+import CopyToClipboard from 'react-copy-to-clipboard'
 
 const CopyField = ({password}) => {
     const myThheme = useTheme()
@@ -46,12 +47,17 @@ const CopyField = ({password}) => {
             >
                 {password}
             </Typography>
-            <IconButton
-                onClick={copyPassword }
-                color='success'
+            <CopyToClipboard
+                onCopy={() => setPassowrdCopyed(true)}
+                text={password}
             >
-                <CopyAllOutlined sx={{color :'white'}}  />
-            </IconButton>
+                <IconButton
+                    // onClick={copyPassword }
+                    color='success'
+                >
+                    <CopyAllOutlined sx={{color :'white'}}  />
+                </IconButton>
+            </CopyToClipboard>
         </Box>
         {
             passwordCopyed && (

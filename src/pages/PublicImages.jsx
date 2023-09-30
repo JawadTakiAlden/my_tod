@@ -145,6 +145,7 @@ const PublicImages = () => {
           setMessage('new image added successfully')
           setMessageType('success')
           setOpenSnackbar(true)
+          setOpen(false)
           },
           onError : (error) => {
             if (error.response){
@@ -221,6 +222,7 @@ const PublicImages = () => {
           i+= values.imageFile.length - i
         }
       }
+      return 
     }
         addImageMutation.mutate(data)
         setOpen(false)
