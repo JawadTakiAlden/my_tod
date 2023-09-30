@@ -8,6 +8,7 @@ import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { request } from '../api/request'
 import { useMutation } from '@tanstack/react-query'
+import CubeLoader from '../components/CubeLoader/CubeLoader'
 
 const sendNotification = (values) => {
     return request({
@@ -88,6 +89,10 @@ const ReadableCards = ({setMessage , setMessageType , setaAlterOpen}) => {
     const sendNotificationHandler = (values) => {
         sendNotificationMutation.mutate(values)
     }
+
+    if(sendNotificationMutation.isLoading){
+        return <CubeLoader />
+    }
   return (
     <>
     <Box
@@ -121,10 +126,7 @@ const ReadableCards = ({setMessage , setMessageType , setaAlterOpen}) => {
 
                         variant='h5'
                     >
-                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ducimus fugit
-                        laudantium ullam unde perferendis doloremque, maiores laborum totam,
-                        voluptatum reprehenderit quos commodi error, fugiat facere velit eaque
-                        beatae? Nemo, culpa.
+                        this is where you can control everything on toddily application
                     </Typography>
                     <Typography
                         sx={{
@@ -159,7 +161,7 @@ const ReadableCards = ({setMessage , setMessageType , setaAlterOpen}) => {
                                     textTransform : 'capitalize'
                                 }}
                             >
-                            dont give you creadintials for anybody else
+                            don't give up your credentials to anyone else
                             </ListItemText>
                         </ListItem>
                         <ListItem
@@ -187,7 +189,7 @@ const ReadableCards = ({setMessage , setMessageType , setaAlterOpen}) => {
                                 textTransform : 'capitalize'
                             }}
                             >
-                                spent some time to read any popup will face you , we put it to tell you about somthing important
+                                read evey popup that comes up , it may contain important information
                             </ListItemText>
                         </ListItem>
                         <ListItem>
@@ -199,7 +201,7 @@ const ReadableCards = ({setMessage , setMessageType , setaAlterOpen}) => {
                                 textTransform : 'capitalize'
                             }}
                             >
-                            any button in dsahboard perform an action , if there are an buttom you dont know what it's fancunality dont click it randomly , please ask technical support to keep your data seaf
+                                all buttons in the dashboard perform impotant actions , if you didn't know the functionality of any button , please contact support
                             </ListItemText>
                         </ListItem>
                     </List>
@@ -237,9 +239,9 @@ const ReadableCards = ({setMessage , setMessageType , setaAlterOpen}) => {
                             }}
                             variant='h5'
                         >
-                            do you want to make a new notification , create new one right now!
+                            send a notification to all parents
                         </Typography>
-                        <Button color='secondary' onClick={handleClickOpen}>create notification</Button>
+                        <Button color='secondary' onClick={handleClickOpen}>send notification</Button>
                     </Box>
                 </Box>
             </GridItem>

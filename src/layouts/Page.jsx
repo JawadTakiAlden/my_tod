@@ -372,7 +372,7 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
             }}
             onClick={addFormOpen}
         >
-            new {name}
+            new {name === 'staff' ? name : (name.slice(0 , name.length - 1))}
         </Button>
         {
             fromOpen && (
@@ -611,15 +611,15 @@ const Page = ({columns , data , name , link , formInputs , validationSchema , va
                     color : colors.yellowAccent[500],
                     textTransform : 'capitalize'
                 }}
-            >Confirm Delete {name} Information</DialogTitle>
+            >Confirm Deleting this {name === 'staff' ? 'user' : (name.slice(0 , name.length - 1))}</DialogTitle>
         <DialogContent>
           <DialogContentText
             sx={{
                 textTransform : 'capitalize'
             }}
           >
-            Are you sure you want to Delete the {name}? this action
-            can't be undone and all data realted with this {name} will be lost.
+            Are you sure you want to Delete this {name === 'staff' ? 'user' : (name.slice(0 , name.length - 1))}? this action
+            can't be undone and all data realted to this {name === 'staff' ? 'user' : (name.slice(0 , name.length - 1))} will be lost.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

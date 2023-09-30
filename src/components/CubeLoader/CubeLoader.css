@@ -5,7 +5,8 @@
     width: 100%;
     height: 100vh;
     z-index: 1000000;
-    background-color: rgba(0, 0, 0, .9);
+    background-color: transparent;
+    opacity: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -18,6 +19,7 @@
     transform-style : preserve-3d;
     transform : rotateX(-30deg);
     animation: animate 4s linear infinite;
+    z-index: 1000000000;
 }
 
 @keyframes animate {
@@ -44,7 +46,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(#151515 , #D0B05C);
+    background: linear-gradient(#27b7cd , #ffcf3a);
     transform: rotateY(calc(90deg * var(--i))) translateZ(75px);
     animation: wallAni 2s linear infinite;
 }
@@ -69,7 +71,7 @@
     left: 0;
     width: 150px;
     height: 150px;
-    background: #222;
+    background: #27b7cd;
     transform: rotateX(90deg) translateZ(75px);
     animation: topAni 2s linear infinite;
 }
@@ -96,16 +98,16 @@
     left: 0;
     width: 150px;
     height: 150px;
-    background: #D0B05C;
+    background: #ffcf3a;
     transform: translateZ(-150px);
     filter: blur(20px);
     animation: bottomAni 2s linear infinite;
     box-shadow: 
-        0 0 120px rgba(0,255,0,0.2),
-        0 0 200px rgba(0,255,0,0.4),
-        0 0 300px rgba(0,255,0,0.6),
-        0 0 400px rgba(0,255,0,0.8),
-        0 0 500px rgba(0,255,0,1),
+        0 0 120px rgb(255, 207, 58 , 0.2),
+        0 0 200px rgba(255, 207, 58, 0.4),
+        0 0 300px rgba(255, 207, 58,0.6),
+        0 0 400px rgba(255, 207, 58,0.8),
+        0 0 500px rgba(255, 207, 58,1),
 }
 
 

@@ -168,7 +168,7 @@ const FAQs = () => {
                 marginBottom : '10px'
             }}
           >
-            after you click on create button , new FAQ will publish for all users and this FAQ cant be update later so take care while writing, and dont worry you can delete FAQ if you make a mistake
+            after you add a Q&A it will publish to all users and this Q&A cannot be update , to take care while writing it , and if you make a mistake you can delete it and write a new one
           </DialogContentText>
           <Formik
         onSubmit={handleFormSubmit}

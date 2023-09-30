@@ -190,7 +190,7 @@ const Events = () => {
                 marginBottom : '10px'
             }}
             >
-                after you click on create button , new Event will publish for all users, and dont worry you can delete Event if you make a mistake
+                after you add an image to an event , this image will publish to all users and this image can't be update but you can delete it if you make a mistake
             </DialogContentText>
             <Formik
                 onSubmit={handleFormSubmit}

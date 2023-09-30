@@ -193,10 +193,11 @@ const Classes = () => {
               sx={{
                 textAlign : 'center',
                 fontSize  : '30px',
-                color : colors.yellowAccent[500]
+                color : colors.yellowAccent[500],
+                textTransform : 'capitalize'
               }}
             >
-              Avialible Teacher
+              available teachers
             </Typography>
             <List>
               {
